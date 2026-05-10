@@ -81,14 +81,14 @@
             background-color: #f0f8ff;
         }
         .option.correct {
-            background-color: #d4edda;
-            border-color: #28a745;
-            color: #155724;
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
         }
         .option.incorrect {
-            background-color: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
         }
         .option.disabled {
             cursor: not-allowed;
@@ -103,11 +103,9 @@
         <button class="reset-btn" onclick="initQuiz()">Tạo lại bộ đề</button>
     </div>
 
-    <div id="quiz-container">
-        </div>
+    <div id="quiz-container"></div>
 
     <script>
-        // Cơ sở dữ liệu 45 câu hỏi
         const rawQuestions = [
             { q: "What is the standard size of the header in a UDP segment?", correct: "8 bytes", incorrect: ["12 bytes", "40 bytes", "20 bytes"] },
             { q: "Which layer in the Internet protocol stack is responsible for supporting network applications like HTTP and SMTP?", correct: "Application layer", incorrect: ["Transport layer", "Network layer", "Link layer"] },
@@ -159,7 +157,6 @@
         let currentScore = 0;
         let totalQuestions = rawQuestions.length;
 
-        // Hàm xáo trộn mảng (Fisher-Yates)
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -168,7 +165,6 @@
             return array;
         }
 
-        // Khởi tạo bài thi
         function initQuiz() {
             currentScore = 0;
             document.getElementById('correct-score').innerText = currentScore;
@@ -177,21 +173,17 @@
             const container = document.getElementById('quiz-container');
             container.innerHTML = '';
 
-            // Clone và xáo trộn mảng câu hỏi
             let shuffledQuestions = shuffleArray([...rawQuestions]);
 
             shuffledQuestions.forEach((item, index) => {
-                // Tạo thẻ chứa câu hỏi
                 const questionCard = document.createElement('div');
                 questionCard.className = 'question-card';
                 
-                // Nội dung câu hỏi
                 const qText = document.createElement('div');
                 qText.className = 'question-text';
                 qText.innerText = `Câu ${index + 1}: ${item.q}`;
                 questionCard.appendChild(qText);
 
-                // Gộp và xáo trộn đáp án
                 let options = [{ text: item.correct, isCorrect: true }];
                 item.incorrect.forEach(inc => options.push({ text: inc, isCorrect: false }));
                 options = shuffleArray(options);
@@ -204,24 +196,28 @@
                     optDiv.className = 'option';
                     optDiv.innerText = opt.text;
                     
-                    // Xử lý sự kiện click
+                    // Lưu trạng thái đúng vào dataset để dễ truy xuất
+                    if (opt.isCorrect) optDiv.dataset.isCorrect = "true";
+                    
                     optDiv.onclick = function() {
-                        // Nếu đã trả lời rồi thì bỏ qua
                         if (optionsContainer.getAttribute('data-answered') === 'true') return;
                         
                         optionsContainer.setAttribute('data-answered', 'true');
                         
-                        // Disable tất cả các option
+                        // Disable tất cả các option và hiển thị kết quả
                         Array.from(optionsContainer.children).forEach(child => {
                             child.classList.add('disabled');
+                            // Tự động tìm và làm nổi bật đáp án đúng (màu xanh)
+                            if (child.dataset.isCorrect === "true") {
+                                child.classList.add('correct');
+                            }
                         });
 
-                        // Kiểm tra đúng sai
                         if (opt.isCorrect) {
-                            optDiv.classList.add('correct');
                             currentScore++;
                             document.getElementById('correct-score').innerText = currentScore;
                         } else {
+                            // Nếu chọn sai, bôi đỏ lựa chọn hiện tại
                             optDiv.classList.add('incorrect');
                         }
                     };
@@ -232,10 +228,9 @@
                 container.appendChild(questionCard);
             });
             
-            window.scrollTo(0, 0); // Cuộn lên đầu trang sau khi reset
+            window.scrollTo(0, 0);
         }
 
-        // Chạy lần đầu
         window.onload = initQuiz;
     </script>
 </body>
