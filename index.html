@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trắc Nghiệm Mạng Máy Tính</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        #sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: #ffffff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .score-board span {
+            color: #27ae60;
+            font-size: 1.4rem;
+        }
+        button.reset-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button.reset-btn:hover {
+            background-color: #2980b9;
+        }
+        #quiz-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .question-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #fafafa;
+        }
+        .option:hover:not(.disabled) {
+            border-color: #3498db;
+            background-color: #f0f8ff;
+        }
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sticky-header">
+        <div class="score-board">Câu đúng: <span id="correct-score">0</span> / <span id="total-score">45</span></div>
+        <button class="reset-btn" onclick="initQuiz()">Tạo lại bộ đề</button>
+    </div>
+
+    <div id="quiz-container">
+        </div>
+
+    <script>
+        // Cơ sở dữ liệu 45 câu hỏi
+        const rawQuestions = [
+            { q: "What is the standard size of the header in a UDP segment?", correct: "8 bytes", incorrect: ["12 bytes", "40 bytes", "20 bytes"] },
+            { q: "Which layer in the Internet protocol stack is responsible for supporting network applications like HTTP and SMTP?", correct: "Application layer", incorrect: ["Transport layer", "Network layer", "Link layer"] },
+            { q: "In TCP, the Maximum Segment Size (MSS) refers to:", correct: "The maximum amount of application-layer data in a segment", incorrect: ["The maximum number of segments allowed in a single connection", "The total length of the segment including the TCP header", "The size of the physical link-layer frame (MTU)"] },
+            { q: "The job of the physical layer is to:", correct: "Move individual bits within a frame from one node to the next", incorrect: ["Manage the interaction between application processes", "Detect bit errors in a transport-layer segment", "Route datagrams from source to destination"] },
+            { q: "What is a key difference between Selective Repeat (SR) and Go-Back-N (GBN)?", correct: "SR can buffer out-of-order packets; GBN usually discards them", incorrect: ["GBN provides reliable delivery; SR provides only best-effort service", "GBN allows for larger sequence numbers than SR", "SR uses a single timer for the entire window; GBN uses one per packet"] },
+            { q: "Which mechanism was introduced in protocol rdt 2.1 to solve the problem of corrupted ACKs or NAKs?", correct: "Sequence numbers for data packets", incorrect: ["A countdown timer for every sent packet", "A larger checksum for control packets", "Pipelining multiple packets in flight"] },
+            { q: "In the context of Reliable Data Transfer (RDT), what does 'Stop-and-Wait' mean?", correct: "The sender sends one packet and waits for an ACK before sending the next", incorrect: ["The receiver stops all traffic if it detects a bit error", "The router drops packets when its buffer is completely full", "The application waits for 1 RTT before initializing a socket"] },
+            { q: "What is a 'cumulative acknowledgment' in the Go-Back-N (GBN) protocol?", correct: "An ACK(n) that confirms all packets up to and including n have been received", incorrect: ["A single NAK that identifies all lost packets in the window", "A timer that accumulates RTT samples to estimate timeout", "An ACK that must be sent twice for every received packet"] },
+            { q: "If the current EstimatedRTT is 100ms and a new SampleRTT is 200ms, assuming alpha = 0.125, the new EstimatedRTT will be:", correct: "112.5ms", incorrect: ["125ms", "187.5ms", "150ms"] },
+            { q: "A TCP socket is uniquely identified by which of the following?", correct: "Source IP, Source Port, Dest IP, Dest Port", incorrect: ["IP address and Ethernet Type field", "Destination IP and Destination Port only", "Source MAC address and Sequence Number"] },
+            { q: "What is a 'protocol' in computer networking?", correct: "Rules that define the format and order of messages sent and received", incorrect: ["A specific type of high-speed physical link", "A hardware device used to interconnect different networks", "A programming language used to build web applications"] },
+            { q: "Which protocol is standardly used to retrieve email from a mail server?", correct: "IMAP", incorrect: ["FTP", "SMTP", "DNS"] },
+            { q: "The primary goal of the Internet Checksum used in UDP is to:", correct: "Detect bit errors (flipped bits) in the transmitted segment", incorrect: ["Guarantee that packets arrive in the correct order", "Prevent unauthorized users from intercepting the data", "Control the rate at which the sender transmits data"] },
+            { q: "Unlike HTTP, the SMTP protocol typically restricts the body of all mail messages to:", correct: "7-bit ASCII", incorrect: ["Encrypted binary data", "Multipurpose Internet Mail Extensions", "Base64 encoded JPEG images"] },
+            { q: "What happens to the average queuing delay as the 'traffic intensity' (La/R) approaches 1?", correct: "It approaches infinity", incorrect: ["It stays constant", "It decreases linearly", "It increases linearly"] },
+            { q: "The User Datagram Protocol (UDP) is best described as:", correct: "A connectionless, 'best-effort' service", incorrect: ["A protocol that guarantees in-order delivery", "A reliable, connection-oriented service", "A protocol that provides flow and congestion control"] },
+            { q: "In Go-Back-N, if packet 5 is lost but packets 6 and 7 arrive, the receiver will:", correct: "Discard packets 6 and 7 and send an ACK for packet 4", incorrect: ["Accept packets 6 and 7 and wait for packet 5 to be retransmitted", "Buffer packets 6 and 7 and send a NAK for packet 5", "Send a duplicate ACK for packet 7"] },
+            { q: "A TCP acknowledgment number (ACK) indicates:", correct: "The sequence number of the next byte expected by the receiver", incorrect: ["The checksum value used to verify the received data", "The total number of bytes received since the connection started", "The current size of the sender's congestion window"] },
+            { q: "Which type of delay depends on the distance between two routers and the propagation speed of the medium?", correct: "Propagation delay", incorrect: ["Queuing delay", "Processing delay", "Transmission delay"] },
+            { q: "What is the standard port number used by a Web (HTTP) server?", correct: "80", incorrect: ["25", "53", "443"] },
+            { q: "The 'Enter Deep' philosophy in CDNs involves:", correct: "Deploying server clusters in access ISPs to get 'close' to users", incorrect: ["Building a few massive data centers in large cities", "Placing servers only at major Internet Exchange Points (IXPs)", "Using satellite links to reach remote regions"] },
+            { q: "In video coding, 'temporal redundancy' refers to:", correct: "Repetition between images in a sequence of frames", incorrect: ["Redundancy within a single spatial image", "The delay between the server and the client during streaming", "The constant bit rate used for high-definition video"] },
+            { q: "In the TCP header, the 'rwnd' field is used to implement:", correct: "Flow control", incorrect: ["Connection setup", "Congestion control", "Error detection"] },
+            { q: "A packet at the transport layer is specifically referred to as a:", correct: "Segment", incorrect: ["Datagram", "Frame", "Message"] },
+            { q: "What is the primary function of the Domain Name System (DNS)?", correct: "Translating hostnames to IP addresses", incorrect: ["Providing security for email transmissions", "Routing packets through the network core", "Ensuring reliable data transfer between hosts"] },
+            { q: "TCP estimates the TimeoutInterval by calculating a 'safety margin' based on:", correct: "An Exponential Weighted Moving Average (EWMA) of RTT deviations", incorrect: ["The fixed value of the current congestion window size", "The number of active TCP connections sharing the router", "The maximum transmission rate of the bottleneck link"] },
+            { q: "A UDP socket is uniquely identified by which two-tuple?", correct: "Destination IP and Destination Port", incorrect: ["Source MAC and Destination MAC", "Source IP and Source Port", "Sequence Number and Acknowledgment Number"] },
+            { q: "The transport layer provides logical communication between _____, whereas the network layer provides it between _____.", correct: "Processes; Hosts", incorrect: ["Switches; Hubs", "Routers; End systems", "Hosts; Processes"] },
+            { q: "How does Persistent HTTP (HTTP/1.1) improve performance over Non-persistent HTTP?", correct: "It allows multiple objects to be sent over a single TCP connection", incorrect: ["It compresses the entity body of every message", "It eliminates the need for any header lines in request messages", "It uses UDP to avoid connection setup delays"] },
+            { q: "In DNS, what information is contained in a Type MX record?", correct: "The canonical name of the mail server for an alias name", incorrect: ["The hostname of the authoritative server for a domain", "The 128-bit IPv6 address of a host", "The IP address of a specific host"] },
+            { q: "What is the job of 'demultiplexing' at the receiving host?", correct: "Delivering the data in a transport-layer segment to the correct socket", incorrect: ["Encapsulating segments with network-layer headers to create datagrams", "Determining the shortest path from source to destination", "Breaking application messages into smaller chunks called packets"] },
+            { q: "During the TCP three-way handshake, if a server receives a SYN from a client, it responds with a SYNACK. What does the acknowledgment number in the SYNACK contain?", correct: "client_isn + 1", incorrect: ["The client's source port number", "The total length of the data field", "server_isn + 1"] },
+            { q: "Which HTTP header line is used by a client to check if a cached object is still up-to-date?", correct: "If-modified-since", incorrect: ["Set-cookie", "User-agent", "Cache-control"] },
+            { q: "Which type of DNS server is the 'contact-of-last-resort' for name resolution?", correct: "Root name server", incorrect: ["Local DNS server", "TLD server", "Authoritative server"] },
+            { q: "DNS is designed as a distributed, hierarchical database primarily to:", correct: "Avoid a single point of failure and handle massive traffic volume", incorrect: ["Make it easier for individual users to manually assign IP addresses", "Prevent routers from having to process application-layer data", "Ensure that all DNS records are stored in a centralized location"] },
+            { q: "DASH (Dynamic, Adaptive Streaming over HTTP) allows a client to:", correct: "Request different chunks of video at various bit rates based on bandwidth", incorrect: ["Force the server to encode video in real-time", "Skip the TCP three-way handshake for faster streaming", "Establish a direct UDP connection for video data"] },
+            { q: "Consider a Stop-and-Wait protocol (rdt 3.0) on a 1 Gbps link with 15 ms propagation delay. For 8000-bit packets, the sender utilization (U) is approximately:", correct: "0.00027", incorrect: ["0.98", "0.5", "0.027"] },
+            { q: "What is a 'bottleneck link' in an end-to-end path?", correct: "The link that constrains the end-to-end throughput", incorrect: ["The link with the highest transmission rate", "A wireless link subject to high interference", "The first link connected to the source host"] },
+            { q: "In Selective Repeat, to avoid ambiguity, the window size must be:", correct: "Less than or equal to half the sequence number space", incorrect: ["Exactly 1 segment", "Equal to the total sequence number space", "Determined by the MSS of the link"] },
+            { q: "The TCP 'three-way handshake' ensures that:", correct: "Both sides are ready for data transfer and have initialized sequence numbers", incorrect: ["The network layer has found the optimal path for packets", "The client has enough disk space to store the file", "The server's IP address has been translated by DNS"] },
+            { q: "The process of wrapping a transport-layer segment with a network-layer header is called:", correct: "Encapsulation", incorrect: ["Routing", "Decapsulation", "Multiplexing"] },
+            { q: "Which characteristic is the most compelling feature of Peer-to-Peer (P2P) architectures?", correct: "Self-scalability", incorrect: ["Centralized management of resources", "Use of fixed, well-known IP addresses", "Always-on infrastructure"] },
+            { q: "Which of the following is NOT one of the four components of cookie technology?", correct: "A list of the user's previously visited IP addresses stored in the router", incorrect: ["A cookie header line in the HTTP response message", "A cookie file kept on the user's host managed by the browser", "A back-end database at the Web site"] },
+            { q: "Which of the following is part of the network edge?", correct: "Personal computer (PC)", incorrect: ["Switch", "Router", "Firewall"] },
+            { q: "If a packet of length L bits is sent over a link with transmission rate R bps, the time required to push all bits into the link is:", correct: "L/R", incorrect: ["L+R", "R/L", "d/s"] }
+        ];
+
+        let currentScore = 0;
+        let totalQuestions = rawQuestions.length;
+
+        // Hàm xáo trộn mảng (Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Khởi tạo bài thi
+        function initQuiz() {
+            currentScore = 0;
+            document.getElementById('correct-score').innerText = currentScore;
+            document.getElementById('total-score').innerText = totalQuestions;
+            
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            // Clone và xáo trộn mảng câu hỏi
+            let shuffledQuestions = shuffleArray([...rawQuestions]);
+
+            shuffledQuestions.forEach((item, index) => {
+                // Tạo thẻ chứa câu hỏi
+                const questionCard = document.createElement('div');
+                questionCard.className = 'question-card';
+                
+                // Nội dung câu hỏi
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.innerText = `Câu ${index + 1}: ${item.q}`;
+                questionCard.appendChild(qText);
+
+                // Gộp và xáo trộn đáp án
+                let options = [{ text: item.correct, isCorrect: true }];
+                item.incorrect.forEach(inc => options.push({ text: inc, isCorrect: false }));
+                options = shuffleArray(options);
+
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'options-container';
+
+                options.forEach(opt => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'option';
+                    optDiv.innerText = opt.text;
+                    
+                    // Xử lý sự kiện click
+                    optDiv.onclick = function() {
+                        // Nếu đã trả lời rồi thì bỏ qua
+                        if (optionsContainer.getAttribute('data-answered') === 'true') return;
+                        
+                        optionsContainer.setAttribute('data-answered', 'true');
+                        
+                        // Disable tất cả các option
+                        Array.from(optionsContainer.children).forEach(child => {
+                            child.classList.add('disabled');
+                        });
+
+                        // Kiểm tra đúng sai
+                        if (opt.isCorrect) {
+                            optDiv.classList.add('correct');
+                            currentScore++;
+                            document.getElementById('correct-score').innerText = currentScore;
+                        } else {
+                            optDiv.classList.add('incorrect');
+                        }
+                    };
+                    optionsContainer.appendChild(optDiv);
+                });
+
+                questionCard.appendChild(optionsContainer);
+                container.appendChild(questionCard);
+            });
+            
+            window.scrollTo(0, 0); // Cuộn lên đầu trang sau khi reset
+        }
+
+        // Chạy lần đầu
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
