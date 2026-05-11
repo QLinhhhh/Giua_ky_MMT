@@ -3,133 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
-  <title>60 câu ôn tập DBMS - Submit từng câu</title>
+  <title>Hệ thống Ôn tập - Trắc nghiệm</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: #f0f2f5;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       padding: 20px;
-      padding-top: 90px;
+      padding-top: 150px; 
       display: flex;
       flex-direction: column;
       align-items: center;
     }
     
-    /* STICKY SCOREBOARD */
     .sticky-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: #0b2b4f;
-      color: white;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; right: 0;
+      background: #0b2b4f; color: white; z-index: 1000;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      padding: 12px 20px;
-      display: flex;
-      justify-content: center;
+      display: flex; flex-direction: column; align-items: center;
     }
     .header-content {
-      max-width: 900px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      max-width: 900px; width: 100%;
+      display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;
     }
-    .stats-box {
-      display: flex;
-      gap: 15px;
-      font-size: 1rem;
-      font-weight: 600;
+    .manager-content {
+      max-width: 900px; width: 100%; background: #1e4572; padding: 10px 20px;
+      display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
     }
+    
+    .stats-box { display: flex; gap: 15px; font-size: 1rem; font-weight: 600; }
     .stat-item {
-      background: rgba(255,255,255,0.15);
-      padding: 6px 15px;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.15); padding: 6px 15px; border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.3);
     }
 
-    .container {
-      max-width: 900px;
-      width: 100%;
-    }
+    select, input[type="file"] { padding: 8px; border-radius: 6px; border: none; font-size: 0.95rem; }
+    select { cursor: pointer; min-width: 200px; font-weight: bold; }
     
-    .question-card {
-      background: white;
-      border-radius: 16px;
-      padding: 25px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
-      position: relative;
+    .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; }
+    .btn-upload {
+        background: #10b981; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none;
     }
-    
-    .q-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 15px;
-      gap: 15px;
-    }
-    .q-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #1e293b;
-      line-height: 1.5;
-    }
-    .q-num {
-      background: #1e6f9f;
-      color: white;
-      min-width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      flex-shrink: 0;
+    .file-upload-wrapper input[type=file] {
+        font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer;
     }
 
-    .options {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
+    .container { max-width: 900px; width: 100%; }
+    
+    .question-card {
+      background: white; border-radius: 16px; padding: 25px; margin-bottom: 25px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 2px solid transparent; transition: all 0.3s ease; position: relative;
     }
+    
+    .q-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px; }
+    .q-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; line-height: 1.5; }
+    .q-num {
+      background: #1e6f9f; color: white; min-width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
     .option-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      cursor: pointer;
-      transition: 0.2s;
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s;
     }
     .option-item:hover { background: #f1f5f9; }
     .option-item input { width: 18px; height: 18px; cursor: pointer; }
 
-    /* NÚT SUBMIT CÂU HỎI */
     .submit-q-btn {
-      background: #1e6f9f;
-      color: white;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      background: #1e6f9f; color: white; border: none; padding: 10px 24px; border-radius: 8px;
+      font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;
     }
     .submit-q-btn:hover { background: #0e4b6b; transform: translateY(-1px); }
     .submit-q-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
 
-    /* TRẠNG THÁI ĐÚNG SAI */
     .card-correct { border-color: #10b981; background: #f0fdf4; }
     .card-wrong { border-color: #ef4444; background: #fef2f2; }
     .card-partial { border-color: #f59e0b; background: #fffbeb; }
@@ -137,27 +84,22 @@
     .opt-correct { background: #dcfce7 !important; border-color: #22c55e !important; font-weight: 600; }
     .opt-wrong { background: #fee2e2 !important; border-color: #ef4444 !important; }
     
-    .status-badge {
-      font-weight: 800;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      margin-left: 10px;
+    .status-badge { font-weight: 800; padding: 4px 12px; border-radius: 6px; font-size: 0.9rem; margin-left: 10px; }
+    
+    .explanation-box {
+      margin-top: 15px; padding: 15px; background: #e0f2fe; border-left: 4px solid #0284c7;
+      border-radius: 6px; font-size: 0.95rem; color: #0f172a; display: none; line-height: 1.5;
     }
+    .explanation-box strong { color: #0284c7; }
 
-    pre {
-      background: #1e293b; color: #e2e8f0; padding: 15px;
-      border-radius: 8px; font-size: 0.85rem; margin: 10px 0; overflow-x: auto;
-    }
-
-    .reset-all {
-      background: #ef4444; color: white; border: none; padding: 8px 16px;
-      border-radius: 8px; cursor: pointer; font-weight: 600;
-    }
+    pre { background: #1e293b; color: #e2e8f0; padding: 15px; border-radius: 8px; font-size: 0.85rem; margin: 10px 0; overflow-x: auto; }
+    .reset-all { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
     @media (max-width: 600px) {
       .header-content { flex-direction: column; gap: 10px; text-align: center; }
-      .stats-box { font-size: 0.85rem; }
+      .manager-content { flex-direction: column; }
+      select { width: 100%; }
+      body { padding-top: 200px; }
     }
   </style>
 </head>
@@ -166,106 +108,713 @@
 <div class="sticky-header">
   <div class="header-content">
     <div class="stats-box">
-      <div class="stat-item">✅ Đúng: <span id="correctCount">0</span> / 60</div>
+      <div class="stat-item">✅ Đúng: <span id="correctCount">0</span> / <span id="totalQuestions">0</span></div>
       <div class="stat-item">📊 Điểm: <span id="livePoints">0.00</span></div>
     </div>
-    <button class="reset-all" onclick="location.reload()">🔄 Đảo câu & Làm lại</button>
+    <button class="reset-all" onclick="resetCurrentQuiz()">🔄 Đảo câu & Làm lại</button>
+  </div>
+  <div class="manager-content">
+    <span style="font-weight: bold;">📚 Chọn bộ đề:</span>
+    <select id="quizSelector" onchange="switchQuiz()"></select>
+    
+    <div class="file-upload-wrapper">
+      <button class="btn-upload">➕ Thêm file JSON</button>
+      <input type="file" id="jsonUpload" accept=".json" onchange="handleFileUpload(event)">
+    </div>
   </div>
 </div>
 
 <div class="container">
-  <h1 style="margin-bottom: 25px; color: #0f172a;">🗄️ DBMS Quiz - Multiple Choice</h1>
+  <h1 id="quizTitle" style="margin-bottom: 25px; color: #0f172a;">Chuyển đổi số Quiz</h1>
   <div id="quizContainer"></div>
 </div>
 
 <script>
-  // DỮ LIỆU GỐC (Giữ nguyên từ code của bạn)
-  const rawData = [
-      { id:1, title:"View trong DBMS là gì?", options:["Một loại index","Một bảng vật lý lưu dữ liệu","Một bảng ảo được tạo từ câu lệnh SELECT ","Một loại Partition"], correct:[2] },
-      { id:2, title:"Câu lệnh nào dùng để tạo View?", options:["NEW VIEW","MAKE VIEW","CREATE VIEW ","SELECT TABLE"], correct:[2] },
-      { id:3, title:"Ưu điểm chính của View là gì?", options:["Giúp bảo mật và đơn giản hóa truy vấn ","Tăng kích thước dữ liệu","Thay thế hoàn toàn bảng thật","Không cần index"], correct:[0] },
-      { id:4, title:"Stored Procedure là gì?", options:["Hàm toán học","Tập hợp các câu lệnh SQL được lưu trong DB ","Một transaction log","Một kiểu dữ liệu"], correct:[1] },
-      { id:5, title:"Khác biệt chính giữa Function và Procedure là gì?", options:["Function luôn trả về giá trị ","Procedure không có tham số","Procedure luôn trả về bảng","Function không chứa SQL"], correct:[0] },
-      { id:6, title:"Mục đích chính của Index là gì?", options:["Tăng số lượng bảng","Xóa dữ liệu nhanh hơn","Tăng tốc truy vấn ","Giảm dung lượng DB"], correct:[2] },
-      { id:7, title:"Primary Key thường tự động tạo loại index nào?", options:["Full-text index","Bitmap index","Non-clustered index","Clustered index "], correct:[3] },
-      { id:8, title:"Full Text Search dùng để:", options:["Tìm kiếm văn bản nâng cao ","Tạo transaction","Đồng bộ dữ liệu","Chia bảng"], correct:[0] },
-      { id:9, title:"Trigger sẽ tự động thực thi khi nào?", options:["Khi backup","Khi tạo bảng","Khi có sự kiện INSERT/UPDATE/DELETE ","Khi khởi động DB"], correct:[2] },
-      { id:10, title:"Trigger BEFORE INSERT dùng để:", options:["Chạy trước khi thêm dữ liệu ","Chạy trước khi xóa dữ liệu","Chạy sau khi xóa dữ liệu","Chạy sau khi thêm dữ liệu"], correct:[0] },
-      { id:11, title:"View nào cho phép cập nhật dữ liệu trực tiếp?", options:["View có GROUP BY","View có UNION","View có DISTINCT","View đơn giản từ một bảng "], correct:[3] },
-      { id:12, title:"Clustered Index ảnh hưởng như thế nào tới dữ liệu?", options:["Xóa dữ liệu","Mã hóa dữ liệu","Sắp xếp vật lý dữ liệu trên đĩa ","Không ảnh hưởng"], correct:[2] },
-      { id:13, title:"Một bảng thường có tối đa bao nhiêu Clustered Index?", options:["1 ","Không giới hạn","0","2"], correct:[0] },
-      { id:14, title:"Một bảng thường có tối đa bao nhiêu Non-Clustered Index?", options:["2","0","Không giới hạn ","1"], correct:[2] },
-      { id:15, title:"Ưu điểm của Full Text Search so với LIKE '%abc%' là gì?", options:["Hỗ trợ stemming/tokenization ","Hỗ trợ ranking ","Giống nhau","Nhanh hơn trên dữ liệu lớn "], correct:[0,1,3] },
-      { id:16, title:"Rủi ro của Trigger là gì?", options:["Không có rủi ro nào","Có thể tạo vòng lặp trigger ","Gây giảm hiệu năng ","Logic khó debug "], correct:[1,2,3] },
-      { id:17, title:"Partitioning là kỹ thuật gì?", options:["Mã hóa dữ liệu","Nén dữ liệu","Chia nhỏ bảng/index thành nhiều phần ","Sao lưu DB"], correct:[2] },
-      { id:18, title:"Range Partitioning thường áp dụng cho dữ liệu nào?", options:["Dữ liệu dạng số ","Dữ liệu nào cũng áp dụng được","Dữ liệu dạng văn bản","Theo khoảng thời gian/ngày tháng "], correct:[0,3] },
-      { id:19, title:"Lệnh dùng để xác nhận transaction là:", options:["COMMIT ","ROLLBACK","FINISH","SAVE"], correct:[0] },
-      { id:20, title:"ROLLBACK dùng để:", options:["Xác nhận dữ liệu","Khôi phục transaction chưa commit ","Khôi phục transaction, dữ liệu bị thay đổi","Khôi phục transaction, dữ liệu không bị thay đổi"], correct:[1] },
-      { id:21, title:"Dirty Read xảy ra khi:", options:["Đọc view","Đọc dữ liệu bị mã hóa","Đọc dữ liệu đã backup","Đọc dữ liệu chưa commit của transaction khác "], correct:[3] },
-      { id:22, title:"Isolation Level nào ngăn Dirty Read?", options:["READ UNCOMMITTED","REPEATABLE-READ ","READ COMMITTED ","SERIALIZABLE "], correct:[1,2,3] },
-      { id:23, title:"Deadlock là gì?", options:["Hỏng replication","Lỗi syntax","Hai transaction chờ khóa lẫn nhau ","Mất index"], correct:[2] },
-      { id:24, title:"Serializable Isolation Level có đặc điểm gì?", options:["Đảm bảo cô lập cao nhất ","Không dùng lock","Nhanh nhất","Chậm nhất "], correct:[0,3] },
-      { id:25, title:"Composite Index là gì?", options:["Index mã hóa","Index cho trigger","Index trên một cột","Index trên nhiều cột "], correct:[3] },
-      { id:26, title:"Recursive Trigger là gì?", options:["Trigger backup","Trigger tự gọi lại chính nó ","Trigger replication","Trigger bình thường"], correct:[1] },
-      { id:27, title:"Replication trong DBMS dùng để:", options:["Tạo index","Đồng bộ dữ liệu giữa nhiều server ","Chia bảng","Tạo trigger"], correct:[1] },
-      { id:28, title:"Master-Slave Replication có đặc điểm nào?", options:["Slave đọc dữ liệu ","Không đồng bộ dữ liệu","Master gửi dữ liệu sang Slave ","Slave ghi dữ liệu chính"], correct:[0,2] },
-      { id:29, title:"Câu lệnh nào tạo đúng một View tên vw_Students?", options:["CREATE VIEW vw_Students AS SELECT * FROM Students; ","MAKE VIEW vw_Students;","CREATE TABLE vw_Students AS SELECT * FROM Students;","NEW VIEW vw_Students;"], correct:[0] },
-      { id:30, title:"Procedure dưới đây dùng để làm gì? <pre>CREATE PROCEDURE sp_GetStudents\nAS\nBEGIN\nSELECT * FROM Students;\nEND;</pre>", options:["Tạo Trigger","Tạo View","Lấy danh sách sinh viên ","Xóa bảng Students"], correct:[2] },
-      { id:31, title:"Procedure dưới đây có bao nhiêu parameter? <pre>CREATE PROCEDURE sp_AddStudent\n@Name NVARCHAR(100),\n@Age INT</pre>", options:["3","1","0","2 "], correct:[3] },
-      { id:32, title:"Lệnh nào gọi đúng Function fn_Sum?", options:["RUN fn_Sum(1,2);","EXEC fn_Sum(1,2);","CALL fn_Sum(1,2);","SELECT dbo.fn_Sum(1,2); "], correct:[3] },
-      { id:33, title:"Query nào dùng Full Text Search?", options:["SELECT * FROM Articles WHERE Content = 'SQL';","SELECT * FROM Articles WHERE CONTAINS(Content, 'SQL'); ","SELECT * FROM Articles WHERE Content > 'SQL';","SELECT * FROM Articles;"], correct:[1] },
-      { id:34, title:"Transaction dưới đây thiếu lệnh gì? <pre>BEGIN TRANSACTION;\nUPDATE Accounts\nSET Balance = Balance - 100;</pre>", options:["COMMIT ","Không thiếu gì"], correct:[0] },
-      { id:35, title:"Composite Index sau phù hợp nhất cho Query nào? <pre>CREATE INDEX idx_Order\nON Orders(CustomerID, OrderDate);</pre>", options:["SELECT * FROM Orders WHERE CustomerID = 1; ","SELECT * FROM Orders WHERE OrderDate = '2025-01-01';"], correct:[0] },
-      { id:36, title:"Lệnh nào rebuild toàn bộ index?", options:["ALTER INDEX ALL ON Orders REBUILD; ","REFRESH INDEX;","CREATE REBUILD INDEX;","REBUILD TABLE Orders;"], correct:[0] },
-      { id:37, title:"Isolation Level cao nhất là:", options:["REPEATABLE READ","READ UNCOMMITTED","SERIALIZABLE ","READ COMMITTED"], correct:[2] },
-      { id:38, title:"SAVEPOINT dùng để:", options:["Đánh dấu điểm rollback trong transaction ","Backup DB","Tạo replication","Tạo index"], correct:[0] },
-      { id:39, title:"LIST Partitioning dùng khi:", options:["Chia theo hash function","Chia dữ liệu theo danh sách giá trị xác định ","Chia ngẫu nhiên dữ liệu","Chia theo index"], correct:[1] },
-      { id:40, title:"Ví dụ phù hợp với LIST Partitioning là:", options:["Chia theo ngày tháng","Chia theo số ngẫu nhiên","Chia theo quốc gia: VN, US, JP ","Chia theo năm"], correct:[2] },
-      { id:41, title:"Query nào tận dụng index tốt nhất?", options:["SELECT * FROM Orders WHERE CustomerID = 5; ","SELECT * FROM Orders WHERE YEAR(OrderDate) = 2025;","SELECT * FROM Orders WHERE OrderDate = '2025-01-01';","SELECT * FROM Orders WHERE TotalAmount > 1000;"], correct:[0] },
-      { id:42, title:"Vì sao query sau có thể không dùng index hiệu quả? <pre>SELECT *\nFROM Orders\nWHERE YEAR(OrderDate) = 2025;</pre>", options:["Vì thiếu GROUP BY","Vì kiểm tra điều kiện qua các functions của cột index ","Vì SELECT *","Vì YEAR() làm mất khả năng seek index "], correct:[1,3] },
-      { id:43, title:"Cho query sau. Index nào tối ưu nhất? <pre>SELECT ProductName, Price\nFROM Products\nWHERE CategoryID = 1;</pre>", options:["CREATE INDEX idx2 ON Products(CategoryID) INCLUDE(ProductName, Price); ","CREATE INDEX idx4 ON Products(Price);","CREATE INDEX idx3 ON Products(ProductName);","CREATE INDEX idx1 ON Products(CategoryID);"], correct:[0] },
-      { id:44, title:"Trong Composite Index, thứ tự cột ảnh hưởng đến:", options:["Khả năng sử dụng index của query ","Không ảnh hưởng gì","Có phụ thuộc vào thứ tự ","Phụ thuộc vào thứ từ từ phải sang trái"], correct:[0,2] },
-      { id:45, title:"Clustered Index khác Nonclustered Index ở điểm:", options:["Không khác nhau","Clustered Index sắp xếp dữ liệu vật lý ","Clustered Index nhanh hơn mọi trường hợp","Nonclustered Index không chứa key"], correct:[1] },
-      { id:46, title:"Cho query sau. Vì sao index có thể không hiệu quả? <pre>SELECT *\nFROM Customers\nWHERE Email LIKE '%gmail.com';</pre>", options:["Vì Email là VARCHAR","Wildcard ở đầu chuỗi ","Vì SELECT *","Vì kiểm tra điều kiện với LIKE trên chuỗi văn bản"], correct:[1] },
-      { id:47, title:"Cho đoạn code sau: <pre>BEGIN TRANSACTION;\nUPDATE Products\nSET Stock = Stock - 1\nWHERE ProductID = 10;\nROLLBACK;</pre>", options:["Transaction vẫn commit","Stock không thay đổi ","Stock giảm 1","Product bị xóa"], correct:[1] },
-      { id:48, title:"Isolation Level nào cho phép Dirty Read?", options:["READ UNCOMMITTED ","SERIALIZABLE","READ COMMITTED","REPEATABLE READ"], correct:[0] },
-      { id:49, title:"Cho transaction: <pre>BEGIN TRANSACTION;\nDELETE FROM Orders WHERE OrderID = 1;\nDELETE FROM OrderDetails WHERE OrderID = 1;\nCOMMIT;</pre>", options:["Không cần COMMIT","Sai syntax","Có thể vi phạm khóa ngoại nếu xóa Orders trước ","Không vấn đề gì"], correct:[2] },
-      { id:50, title:"Trong hệ thống lưu log hàng tỷ bản ghi theo thời gian, loại partitioning phù hợp nhất là:", options:["LIST Partitioning","HASH Partitioning","KEY Partitioning","RANGE Partitioning theo ngày/tháng "], correct:[3] },
-      { id:51, title:"Cho bảng partition theo HASH(CustomerID). Ưu điểm lớn nhất của HASH Partitioning là gì?", options:["Không cần index","Query theo ngày nhanh hơn","Dữ liệu phân phối đồng đều giữa các partition ","Không cần statistics"], correct:[2] },
-      { id:52, title:"Partition Scheme dùng để:", options:["Ánh xạ partition vào filegroup ","Tạo index","Tạo trigger","Tạo View"], correct:[0] },
-      { id:53, title:"Lợi ích lớn nhất của Partitioning trên bảng lớn là:", options:["Không có lợi ích gì","Tăng tốc query và quản lý dữ liệu dễ hơn ","Không cần index","Không cần backup"], correct:[1] },
-      { id:54, title:"Có Composite Partitioning không?", options:["Không","Có "], correct:[1] },
-      { id:55, title:"Thiết kế nào phù hợp cho hệ thống thương mại điện tử toàn cầu?", options:["HASH theo UserID","LIST theo quốc gia","Không cần partition","LIST theo quốc gia + HASH theo UserID "], correct:[3] },
-      { id:56, title:"Hệ thống nào phù hợp cho giao dịch thời gian thực?", options:["OLAP","Data Warehouse","OLTP ","Data Mining"], correct:[2] },
-      { id:57, title:"Ví dụ điển hình của hệ thống OLTP là:", options:["Báo cáo tài chính","Dashboard phân tích doanh thu","Data Warehouse","Hệ thống chuyển khoản ngân hàng "], correct:[3] },
-      { id:58, title:"Ví dụ điển hình của hệ thống OLAP là:", options:["Báo cáo phân tích doanh thu ","ATM ngân hàng","Đặt hàng online","Thanh toán online"], correct:[0] },
-      { id:59, title:"Hệ thống nào thường yêu cầu ACID nghiêm ngặt hơn?", options:["OLTP ","Backup System","OLAP"], correct:[0] },
-      { id:60, title:"Hệ thống nào thường dùng Data Warehouse?", options:["OLAP ","OLTP"], correct:[0] }
+  // DỮ LIỆU ĐÃ ĐƯỢC CHUẨN HÓA (50 CÂU)
+  const defaultData = [
+    {
+      "id": 1,
+      "title": "Phân biệt Số hóa (Digitization) và Số hóa quy trình/hoạt động (Digitalization). Điểm khác biệt cốt lõi giữa Số hóa và Số hóa quy trình là gì?",
+      "options": [
+        "Số hóa là sự thay đổi mô hình kinh doanh, còn số hóa quy trình là ứng dụng công nghệ để quản lý nhân sự.",
+        "Số hóa là chuyển đổi dữ liệu từ định dạng vật lý sang định dạng số, còn số hóa quy trình là tận dụng dữ liệu số đó để tự động hóa và cải thiện các hoạt động kinh doanh.",
+        "Số hóa tập trung chủ yếu vào yếu tố con người, còn số hóa quy trình tập trung vào máy móc.",
+        "Số hóa quy trình diễn ra trước để làm nền tảng, sau đó mới đến bước số hóa dữ liệu."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Số hóa (digitization): đơn giản là việc chuyển đổi thông tin, dữ liệu trong tổ chức từ dạng analog (tương tự) sang dạng phiên bản số (điện tử). Tăng cường ứng dụng công nghệ số/số hóa quy trình (digitalization): diễn ra sau khi thực hiện bước số hóa và liên quan đến việc tổ chức khai thác, tận dụng quá trình số hóa để cải thiện, hoàn thiện các quy trình kinh doanh. Do đó, số hóa là nền tảng, còn số hóa quy trình là mảng ứng dụng cải thiện vận hành."
+    },
+    {
+      "id": 2,
+      "title": "Phân biệt Kỹ năng số (Digital Skills) và Kiến thức kỹ thuật số (Digital Literacy). Phát biểu nào sau đây là SAI khi phân biệt Kỹ năng số và Kiến thức kỹ thuật số?",
+      "options": [
+        "Kỹ năng số tập trung vào việc trả lời câu hỏi 'Cái gì?' và 'Như thế nào?', ví dụ như biết cách dùng một phần mềm.",
+        "Kiến thức kỹ thuật số trả lời cho câu hỏi chuyên sâu hơn như 'Lý do tại sao?', 'Khi nào nên dùng?' và 'Dùng cho ai?'.",
+        "Kỹ năng số đòi hỏi người dùng phải biết cách sử dụng công nghệ một cách có trách nhiệm, an toàn và thấu hiểu các rủi ro bảo mật đi kèm.",
+        "Biết cách sử dụng Microsoft Word là kỹ năng số, còn việc sử dụng nó để truyền đạt rõ ràng hiệu quả các thành phần của bài tập là kiến thức kỹ thuật số."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu miêu tả đặc điểm của Kiến thức kỹ thuật số, không phải Kỹ năng số. 'Kiến thức kỹ thuật số không chỉ là sự thành thạo kỹ thuật và kỹ năng sử dụng công nghệ mà còn là học cách sử dụng công nghệ một cách có trách nhiệm và an toàn'."
+    },
+    {
+      "id": 3,
+      "title": "Phân biệt Tin học hóa (Ứng dụng CNTT) và Chuyển đổi số (Digital Transformation). Phát biểu nào sau đây là SAI khi so sánh Tin học hóa và Chuyển đổi số?",
+      "options": [
+        "Tin học hóa là việc số hóa quy trình nghiệp vụ đã có và thường không làm thay đổi bản chất của quy trình hay mô hình hoạt động.",
+        "Chuyển đổi số tập trung vào việc tạo ra các giá trị, lợi ích và dịch vụ mới thay vì chỉ tập trung vào tối ưu chi phí.",
+        "Khi việc tin học hóa đạt ở mức độ cao và làm thay đổi mô hình hoạt động, nó sẽ dẫn đến và được gọi là chuyển đổi số.",
+        "Tin học hóa lấy dữ liệu làm trung tâm, trong khi Chuyển đổi số lấy năng suất cá nhân làm trung tâm."
+      ],
+      "correct": [3],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu D sai hoàn toàn về bản chất cốt lõi. Số hóa lấy năng suất cá nhân là trung tâm, số hóa quy trình lấy quy trình là trung tâm còn Chuyển đổi số lấy dữ liệu là trung tâm."
+    },
+    {
+      "id": 4,
+      "title": "Phân biệt Công nghệ thông tin (IT) truyền thống và Công nghệ số (Digital Technology). Điểm khác biệt cốt lõi giữa Công nghệ thông tin và Công nghệ số trong bối cảnh hiện nay là gì?",
+      "options": [
+        "Công nghệ thông tin là nền tảng của tự động hóa, còn Công nghệ số không liên quan đến tự động hóa.",
+        "Công nghệ số (nghĩa hẹp) là một bước phát triển cao hơn của công nghệ thông tin, cho phép tính toán nhanh hơn, xử lý dữ liệu khổng lồ với chi phí rẻ hơn nhờ AI, Big Data, Cloud.",
+        "Công nghệ thông tin sinh ra dữ liệu, còn công nghệ số là các thiết bị phần cứng để lưu trữ.",
+        "Công nghệ số chỉ là thuật ngữ khác của việc cài đặt phần mềm máy tính nội bộ trong kỷ nguyên trước đây."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Trong bối cảnh cuộc Cách mạng công nghiệp lần thứ tư, công nghệ số, hiểu theo nghĩa hẹp, là một bước phát triển cao hơn, là bước phát triển tiếp theo của công nghệ thông tin, cho phép tính toán nhanh hơn, xử lý dữ liệu nhiều hơn, truyền tải dung lượng lớn hơn, với chi phí rẻ hơn."
+    },
+    {
+      "id": 5,
+      "title": "Phân biệt Cơ chế Sandbox và Thể chế pháp luật truyền thống. Phát biểu nào sau đây là SAI về sự khác biệt giữa Sandbox và Thể chế truyền thống?",
+      "options": [
+        "Thể chế truyền thống thường có độ trễ nhất định so với tốc độ phát triển và thay đổi nhanh chóng của công nghệ 4.0.",
+        "Sandbox là bộ luật chính thức, áp dụng vĩnh viễn và đại trà cho mọi doanh nghiệp ngay từ khi mới ra mắt công nghệ.",
+        "Cơ chế Sandbox cho phép thử nghiệm các sản phẩm, mô hình kinh doanh số mới với các miễn trừ pháp lý trong giới hạn nhất định.",
+        "Sandbox quy định rõ ràng về phạm vi không gian và thời gian nhằm kiểm soát rủi ro trước khi ban hành thể chế/luật chính thức."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu B sai. Cơ chế Sandbox là khung thử nghiệm có kiểm soát với các miễn trừ pháp lý tạm thời, cho phép thử nghiệm công nghệ mới trong phạm vi giới hạn để đánh giá rủi ro trước khi ban hành luật chính thức. Sandbox không áp dụng vĩnh viễn hay đại trà."
+    },
+    {
+      "id": 6,
+      "title": "Phân biệt Chuyển đổi mô hình Kinh doanh và Chuyển đổi mô hình Quản trị. Phát biểu nào sau đây là SAI khi phân biệt Chuyển đổi số mô hình kinh doanh và Chuyển đổi số mô hình quản trị?",
+      "options": [
+        "Chuyển đổi mô hình kinh doanh (đối ngoại) tập trung vào nâng cao trải nghiệm khách hàng và mở rộng kênh phân phối.",
+        "Việc ứng dụng công nghệ số vào chuỗi cung ứng chỉ thuộc phạm vi chuyển đổi mô hình quản trị, không liên quan đến mô hình kinh doanh.",
+        "Chuyển đổi mô hình quản trị (đối nội) tập trung tự động hóa quy trình dự báo, lập kế hoạch quản lý nguồn lực và xây dựng hệ thống báo cáo.",
+        "Cả hai mô hình này đều yêu cầu xây dựng chung một hệ thống/khung cơ sở bảo mật dữ liệu và an toàn thông tin."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu B sai. Theo giáo trình, nội dung của Chuyển đổi số mô hình kinh doanh bao gồm 'Áp dụng công nghệ số cho chuỗi cung ứng' vì chuỗi cung ứng kết nối trực tiếp với hoạt động bán hàng và luân chuyển giá trị cho khách hàng."
+    },
+    {
+      "id": 7,
+      "title": "Phân biệt Quản trị truyền thống (mệnh lệnh) và Quản trị Chuyển đổi số. Điểm khác biệt cốt lõi giữa phong cách quản trị truyền thống và quản trị trong Chuyển đổi số là gì?",
+      "options": [
+        "Quản trị trong CĐS phân chia dữ liệu thành các 'ốc đảo thông tin' để tăng cường bảo mật cho từng phòng ban.",
+        "Quản trị truyền thống linh hoạt hơn do lãnh đạo quyết định trực tiếp bằng trực giác và kinh nghiệm.",
+        "Quản trị trong CĐS dịch chuyển từ mô hình mệnh lệnh, kiểm soát thủ công sang mô hình phân quyền cho nhân viên tự ra quyết định dựa trên dữ liệu thời gian thực.",
+        "Quản trị trong CĐS tập trung hoàn toàn vào thay đổi thiết bị phần cứng, không quan tâm đến kỹ năng và văn hóa nhân viên."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> CĐS giúp chuyển đổi từ mô hình quản trị mệnh lệnh, nơi mà phụ thuộc vào kiểm soát thủ công sang quản trị dựa trên dữ liệu và trao quyền quyết định cho nhân viên dựa trên dữ liệu cập nhật theo thời gian thực. Trái ngược với việc tạo ra 'ốc đảo dữ liệu', CĐS nhằm xóa bỏ ốc đảo thông tin."
+    },
+    {
+      "id": 8,
+      "title": "Phân biệt Kênh phân phối truyền thống và Kênh phân phối Số (D2C, O2O). Phát biểu nào sau đây là SAI khi so sánh kênh phân phối truyền thống và phân phối số?",
+      "options": [
+        "Mô hình D2C (Direct to Customer) là minh chứng cho việc chuyển đổi số tập trung vào khách hàng, bỏ qua hoặc giảm bớt các khâu trung gian.",
+        "Kênh phân phối truyền thống thường giúp doanh nghiệp tiếp cận khách hàng trực tiếp, thấu hiểu dữ liệu và hành vi nhanh hơn các startup số.",
+        "Với D2C, doanh nghiệp làm chủ dữ liệu của khách hàng, từ đó dễ dàng thực hiện cá nhân hóa chiến dịch tiếp thị.",
+        "Các doanh nghiệp lớn truyền thống khó lòng phá bỏ ngay kênh truyền thống mà thường kết hợp làm cho nó thông minh hơn song song với thử nghiệm kênh mới."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Kênh truyền thống qua nhiều tầng lớp đại lý khiến doanh nghiệp mất kết nối trực tiếp với dữ liệu khách hàng cuối. Các startup thường lựa chọn kênh phân phối hiện đại nhằm tiếp cận khách hàng nhanh và trực tiếp hơn, làm chủ dữ liệu (D2C)."
+    },
+    {
+      "id": 9,
+      "title": "Phân biệt Lưu trữ tại chỗ (On-premise/Trung tâm dữ liệu riêng) và Lưu trữ đám mây (Cloud). Điểm khác biệt cốt lõi giữa Lưu trữ tại chỗ và Lưu trữ trên đám mây là gì?",
+      "options": [
+        "Lưu trữ đám mây giúp doanh nghiệp chủ động tuyệt đối về hạ tầng cứng nhưng tốn nhiều công sức bảo trì.",
+        "Lưu trữ tại chỗ có tính linh hoạt và khả năng co giãn dung lượng cao hơn đám mây.",
+        "Lưu trữ tại chỗ đòi hỏi doanh nghiệp tự đầu tư máy chủ với chi phí và công vận hành cao, trong khi Cloud giúp giảm thiểu chi phí đầu tư hạ tầng ban đầu và dễ dàng co giãn.",
+        "Cả hai hệ thống đều yêu cầu doanh nghiệp phải mua bản quyền phần mềm theo dạng license cài đặt vĩnh viễn trên máy cá nhân."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Lưu trữ tại chỗ: Doanh nghiệp tự đầu tư máy chủ -> Chủ động >< Chi phí cao + Tốn công vận hành. Lưu trữ trên đám mây: Đảm bảo khả năng co giãn theo dữ liệu, giảm chi phí đầu tư hạ tầng cứng ban đầu cho doanh nghiệp."
+    },
+    {
+      "id": 10,
+      "title": "Phân biệt Doanh nghiệp Tập đoàn lớn và Doanh nghiệp SME trong CĐS. Phát biểu nào sau đây là SAI khi so sánh lợi thế/thách thức CĐS giữa doanh nghiệp (Tập đoàn lớn) và SME?",
+      "options": [
+        "Tập đoàn lớn thường gặp khó khăn bởi 'Sức ỳ tổ chức' và 'Nợ dữ liệu' do có nhiều hệ thống di sản cồng kềnh.",
+        "Các SME sở hữu 'Lợi thế linh hoạt số', dễ dàng thích ứng nhanh với các biến động của thị trường.",
+        "Tập đoàn lớn thường dễ dàng áp dụng CĐS toàn diện trong một sớm một chiều nhờ nguồn vốn khổng lồ.",
+        "Các SME thường có dữ liệu 'sạch' và ít bị nhiễu bởi các hệ thống phần mềm cũ rườm rà."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Việc chuyển đổi ở tập đoàn lớn mất rất nhiều thời gian và phải qua các dự án sandbox nhỏ để tránh xáo trộn hệ thống di sản. Họ gặp khó do 'Nợ dữ liệu' và 'Sự ì tổ chức'."
+    },
+    {
+      "id": 11,
+      "title": "Phân biệt Chế độ vận hành 1 (Marathon) và Chế độ vận hành 2 (Chạy nước rút) trong CĐS. Điểm khác biệt cốt lõi giữa hai chế độ vận hành (Bimodal IT) theo Gartner trong tổ chức CĐS là gì?",
+      "options": [
+        "Chế độ 1 tập trung vào các dự án rủi ro cao, trong khi Chế độ 2 tập trung vào việc bảo trì máy chủ cũ.",
+        "Chế độ 1 là sự vận hành các hoạt động kinh doanh hiện tại với sự bền bỉ (marathon), còn Chế độ 2 dành cho các dự án CĐS với quy trình ra quyết định nhanh, thử nghiệm và tăng tốc (nước rút).",
+        "Chế độ 1 yêu cầu phân quyền hoàn toàn cho nhân viên, còn Chế độ 2 đòi hỏi sự kiểm soát nghiêm ngặt từ ban lãnh đạo cấp cao.",
+        "Chế độ 2 diễn ra trước, sau khi hoàn thành toàn bộ mới chuyển sang Chế độ 1 để kinh doanh."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Chế độ 1 là vận hành hoạt động kinh doanh hiện tại với tốc độ của VĐV marathon. Chế độ 2 vận hành cho các dự án CĐS với quy trình ra quyết định nhanh, sẵn sàng tăng tốc như VĐV chạy nước rút."
+    },
+    {
+      "id": 12,
+      "title": "Phân biệt Bán sản phẩm (Truyền thống) và Bán dịch vụ (Servitization). Phát biểu nào sau đây là SAI khi phân biệt mô hình bán sản phẩm truyền thống và mô hình hướng dịch vụ (Servitization) trong CĐS?",
+      "options": [
+        "Chuyển từ bán sản phẩm sang bán dịch vụ là việc thấu hiểu và gắn kết khách hàng tức thời để tạo ra trải nghiệm tốt hơn.",
+        "Servitization yêu cầu doanh nghiệp phải tự cô lập bộ phận R&D (Nghiên cứu & Phát triển) để bảo mật thiết kế thay vì cho khách hàng cung cấp phản hồi sớm.",
+        "Trong mô hình mới (X as a service), doanh nghiệp cung cấp giải pháp/dịch vụ tổng thể thay vì chỉ bán đứt một sản phẩm vật lý.",
+        "Trọng tâm của Servitization là chuyển từ việc chỉ tập trung vào sản phẩm sang lấy khách hàng làm trung tâm."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Xu hướng servitization đòi hỏi khách hàng được mời cung cấp phản hồi sớm cho doanh nghiệp ngay từ giai đoạn đầu phát triển sản phẩm mới, thay vì cô lập bộ phận R&D."
+    },
+    {
+      "id": 13,
+      "title": "Phân biệt Dịch vụ phần mềm (SaaS) và Dịch vụ nền tảng (PaaS) trên Cloud. Điểm khác biệt cốt lõi giữa mô hình SaaS và PaaS trong Điện toán đám mây là gì?",
+      "options": [
+        "SaaS dành cho các nhà phát triển phần mềm tự viết code, còn PaaS dành cho người dùng cuối đọc tin tức.",
+        "SaaS là dịch vụ cung cấp hạ tầng máy chủ vật lý, còn PaaS cung cấp các ứng dụng web như Gmail.",
+        "SaaS phù hợp với người dùng cuối (như Gmail, Google Drive) vì không đòi hỏi kỹ thuật cao; trong khi PaaS thích hợp cho lập trình viên/công ty muốn môi trường để tự xây dựng phần mềm.",
+        "PaaS cho phép khách hàng kiểm soát toàn bộ 100% máy chủ vật lý mà không phải chia sẻ với ai."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> SaaS phù hợp nhất với khách hàng là người dùng cuối (VD: Gmail). PaaS thích hợp với các nhà phát triển phần mềm vì cung cấp nền tảng (cơ sở dữ liệu, máy chủ) để họ tự xây dựng, nhưng sự kiểm soát máy chủ vật lý vẫn bị giới hạn."
+    },
+    {
+      "id": 14,
+      "title": "Phân biệt vai trò 'Công dân kỹ thuật số' và 'Nhà tư tưởng tính toán' (Chuẩn ISTE). Phát biểu nào sau đây là SAI khi phân biệt các chuẩn vai trò kỹ năng số của ISTE?",
+      "options": [
+        "Công dân kỹ thuật số (Digital citizen) là người biết cách hoạt động một cách an toàn và có đạo đức trên không gian mạng.",
+        "Nhà tư tưởng tính toán (Computational thinker) là người sử dụng các chiến lược logic và máy móc để giải quyết các vấn đề.",
+        "Người học được trao quyền (Empowered learner) là người dựa vào công nghệ số để tìm kiếm thông tin và đạt được mục tiêu học tập.",
+        "Công dân kỹ thuật số là cấp độ đánh giá thông tin để kiến tạo tri thức hợp lý, thay thế hoàn toàn vai trò của 'Kiến tạo tri thức'."
+      ],
+      "correct": [3],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu D sai. Việc 'đánh giá thông tin để kiến tạo tri thức hợp lý' là định nghĩa của vai trò Kiến tạo tri thức (Knowledge constructor), độc lập và không thay thế vai trò Công dân kỹ thuật số."
+    },
+    {
+      "id": 15,
+      "title": "Phân biệt Hạ tầng công nghệ số và Hệ sinh thái công nghệ. Điểm khác biệt cốt lõi giữa Hạ tầng công nghệ và Hệ sinh thái công nghệ trong doanh nghiệp là gì?",
+      "options": [
+        "Hạ tầng công nghệ chỉ bao gồm các thiết bị phần cứng không kết nối mạng, còn Hệ sinh thái bao gồm toàn bộ phần mềm.",
+        "Hạ tầng công nghệ là nền tảng (tập hợp công nghệ kỹ thuật số) cung cấp năng lực thực thi cho CNTT; còn Hệ sinh thái công nghệ là toàn bộ kiến trúc, phương tiện xử lý thông tin rộng hơn nhằm tạo nền tảng hỗ trợ hoặc đột phá cho các hệ sinh thái khác.",
+        "Hạ tầng công nghệ tập trung vào con người, còn Hệ sinh thái công nghệ tập trung vào máy móc.",
+        "Hệ sinh thái công nghệ ra đời trước, sau đó mới xây dựng hạ tầng công nghệ để hỗ trợ hệ sinh thái."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Hạ tầng công nghệ số là tập hợp công nghệ cung cấp năng lực thực thi cho các hoạt động. Hệ sinh thái công nghệ rộng hơn, là kiến trúc/giao diện tạo nền tảng thúc đẩy đột phá cho các hệ sinh thái khác."
+    },
+    {
+      "id": 16,
+      "title": "Phân biệt Ứng dụng CNTT (Tin học hóa) và Chuyển đổi số. Phát biểu nào sau đây là SAI về sự khác biệt giữa Tin học hóa và Chuyển đổi số theo Bộ TT&TT?",
+      "options": [
+        "Tin học hóa chuyển từ cách làm toàn diện sang cách làm từng phần, trong khi CĐS chuyển từ làm từng phần sang làm toàn diện.",
+        "Tin học hóa thường sử dụng các phần mềm riêng lẻ, còn Chuyển đổi số sử dụng nền tảng số dùng chung.",
+        "Tin học hóa thường tập trung trả lời câu hỏi 'làm như thế nào' (tối ưu quy trình cũ), còn Chuyển đổi số chú trọng 'làm cái gì' (tạo ra giá trị mới).",
+        "Tin học hóa chủ yếu coi chi phí là gánh nặng, còn Chuyển đổi số chuyển hướng từ chi phí sang tạo ra lợi ích và giá trị."
+      ],
+      "correct": [0],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu A bị đảo ngược vế. Chuyển đổi số mới là quá trình chuyển từ làm từng phần sang làm toàn diện, từ phần mềm riêng lẻ sang nền tảng số dùng chung."
+    },
+    {
+      "id": 17,
+      "title": "Phân biệt Thể chế kiến tạo và Chờ đợi luật pháp hoàn thiện. Phát biểu nào sau đây là SAI khi nói về sự khác biệt giữa tư duy 'thể chế kiến tạo' và 'chờ hoàn thiện luật pháp' trong CĐS?",
+      "options": [
+        "Thể chế kiến tạo cho phép áp dụng cơ chế Sandbox để thử nghiệm mô hình kinh doanh số mới ngay cả khi quy định pháp luật chưa đầy đủ.",
+        "Việc chờ 'xây dựng thể chế xong mới chuyển đổi số' là an toàn tuyệt đối và giúp doanh nghiệp không bỏ lỡ bất kỳ cơ hội thị trường nào.",
+        "Thể chế cần đi trước một bước để chấp nhận rủi ro, nuôi dưỡng sự sáng tạo thay vì trở thành rào cản của đổi mới.",
+        "Chuyển đổi số là cuộc cách mạng về thể chế nhiều hơn về công nghệ, vì nếu thể chế không đổi mới thì công nghệ không thể phát huy hiệu quả."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Không nên đợi 'xây dựng thể chế xong mới CĐS' vì sự trễ của thể chế so với tốc độ công nghệ sẽ khiến bỏ lỡ cơ hội. Cần xây dựng song hành để tạo Thể chế kiến tạo."
+    },
+    {
+      "id": 18,
+      "title": "Phân biệt 'Ốc đảo thông tin' và 'Quản trị liên thông' (ERP). Điểm khác biệt cốt lõi giữa hệ thống quản trị thủ công tạo ra 'ốc đảo thông tin' và hệ thống liên thông (như ERP) là gì?",
+      "options": [
+        "ERP lưu trữ dữ liệu tại nhiều nguồn khác nhau để backup, còn ốc đảo thông tin lưu tại một nguồn duy nhất.",
+        "Ốc đảo thông tin khiến các phòng ban (kho, kế toán) dùng phần mềm riêng rẽ gây ra độ trễ dữ liệu; trong khi ERP lưu dữ liệu tại nguồn duy nhất, cập nhật thời gian thực và liên thông tự động cho tất cả các bộ phận.",
+        "ERP yêu cầu nhân viên phải nhập tay báo cáo tài chính mỗi ngày, còn ốc đảo thông tin tự động hóa hoàn toàn.",
+        "Ốc đảo thông tin giúp doanh nghiệp ra quyết định tức thời, trong khi ERP gây ra sự chậm trễ trong quản lý."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Ốc đảo thông tin là khi mỗi bộ phận dùng bộ dữ liệu riêng gây độ trễ. Giải pháp ERP giúp mọi dữ liệu được lưu 1 lần tại nguồn duy nhất, tự động cập nhật thời gian thực liên thông."
+    },
+    {
+      "id": 19,
+      "title": "Phân biệt Môi trường làm việc số (Digital workplace) và Văn phòng truyền thống có máy tính. Phát biểu nào sau đây là SAI khi phân biệt Môi trường làm việc số và việc số hóa thiết bị đơn thuần?",
+      "options": [
+        "Môi trường làm việc số không chỉ đơn thuần là mua sắm thiết bị như máy tính hay mạng internet cho nhân viên.",
+        "Cốt lõi của Môi trường làm việc số là tạo ra một môi trường tương tác, chia sẻ phù hợp với đội ngũ, thúc đẩy làm việc nhóm và từ xa một cách linh hoạt.",
+        "Việc một nhân viên dùng phần mềm mặc định trên máy tính cá nhân mà không ai truy cập được chính là hình mẫu lý tưởng của Môi trường làm việc số.",
+        "Ứng dụng các công cụ như Google Workspace hay Office 365 để nhiều người có thể truy cập, chỉnh sửa cùng lúc là biểu hiện của Môi trường làm việc số."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Việc lưu trên máy cá nhân không ai truy cập được đi ngược lại với Môi trường làm việc số/Số hóa quy trình (nơi yêu cầu các phần mềm mà nhiều người có thể truy cập và tương tác cùng lúc)."
+    },
+    {
+      "id": 20,
+      "title": "Phân biệt CĐS Doanh nghiệp và CĐS trong kinh doanh. Điểm khác biệt cốt lõi giữa 'Chuyển đổi số trong doanh nghiệp' và 'Chuyển đổi số trong kinh doanh' theo định nghĩa học thuật là gì?",
+      "options": [
+        "CĐS doanh nghiệp chỉ tập trung vào marketing, còn CĐS kinh doanh tập trung vào máy móc sản xuất.",
+        "CĐS doanh nghiệp là việc tích hợp công nghệ để nâng cao hiệu quả quản lý, năng lực và sức cạnh tranh tổng thể; trong khi CĐS kinh doanh nhấn mạnh việc thay đổi cụ thể mô hình kinh doanh để tạo ra cơ hội, doanh thu và giá trị mới trong mối quan hệ với các bên.",
+        "CĐS doanh nghiệp không liên quan đến tự động hóa, còn CĐS kinh doanh thì có.",
+        "Hai khái niệm này hoàn toàn trái ngược nhau và không thể áp dụng đồng thời trong cùng một tổ chức."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> CĐS trong kinh doanh nhằm thay đổi mô hình kinh doanh tạo ra giá trị mới. CĐS trong doanh nghiệp rộng hơn, áp dụng công nghệ nâng cao hiệu quả quản lý, sức cạnh tranh tổng thể của cả bộ máy."
+    },
+    {
+      "id": 21,
+      "title": "Phân biệt Khách hàng truyền thống và Khách hàng kỷ nguyên số. Phát biểu nào sau đây là SAI về đặc điểm khác biệt của Khách hàng trong kỷ nguyên số so với truyền thống?",
+      "options": [
+        "Khách hàng kỷ nguyên số bị giới hạn bởi không gian và thời gian khi mua sắm, tương tự như khách hàng truyền thống.",
+        "Họ có kỳ vọng cao về sự cá nhân hóa trong các chiến dịch tiếp thị và sản phẩm.",
+        "Họ đề cao nhu cầu về quyền riêng tư và bảo mật dữ liệu cá nhân.",
+        "Họ là những người tiêu dùng thông minh, tiếp cận nhiều nguồn thông tin, đánh giá trước khi đưa ra quyết định mua hàng."
+      ],
+      "correct": [0],
+      "explanation": "<strong>Giải thích:</strong> Khách hàng trong bối cảnh số có đặc điểm là 'Kết nối không giới hạn về không gian và thời gian', không bị giới hạn như trước đây."
+    },
+    {
+      "id": 22,
+      "title": "Phân biệt Quản trị nhà nước trực tuyến và Chính sách bảo vệ dữ liệu. Điểm khác biệt cốt lõi giữa hai nhóm chính sách tác động đến cung-cầu trong CĐS này là gì?",
+      "options": [
+        "Quản trị nhà nước trực tuyến quy định về thu thuế doanh nghiệp; còn Bảo vệ dữ liệu quy định về thương mại điện tử.",
+        "Quản trị nhà nước trực tuyến (Internet governance) quy định các nguyên tắc cho hoạt động sử dụng Internet tại các cơ quan nhà nước; trong khi Chính sách bảo vệ dữ liệu điều chỉnh quyền của chủ thể dữ liệu và nghĩa vụ của người thu thập, xử lý dữ liệu.",
+        "Chính sách bảo vệ dữ liệu chỉ áp dụng cho người dân, không áp dụng cho người kiểm soát dữ liệu.",
+        "Quản trị nhà nước trực tuyến cho phép chia sẻ dữ liệu xuyên biên giới mà không cần bất kỳ ràng buộc nào."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Theo giáo trình, Chính sách bảo vệ dữ liệu điều chỉnh quyền chủ thể và nghĩa vụ người kiểm soát dữ liệu. Quản trị nhà nước trực tuyến liên quan đến nguyên tắc hoạt động/sử dụng Internet tại cơ quan nhà nước."
+    },
+    {
+      "id": 23,
+      "title": "Phân biệt Mô hình kinh doanh Subscription (Thuê bao) và Membership (Thành viên). Phát biểu nào sau đây là SAI khi so sánh các mô hình kinh doanh số mới?",
+      "options": [
+        "Mô hình Subscription (Thuê bao) thường được áp dụng bởi các dịch vụ nội dung số như Netflix, New York Times.",
+        "Mô hình Membership (Kinh tế thành viên) tập trung vào việc tạo cộng đồng và gắn kết, ví dụ như Dollar Shave Club.",
+        "Cả hai mô hình đều là sự dịch chuyển từ việc chỉ bán đứt sản phẩm một lần sang việc bán dịch vụ và thu tiền định kỳ.",
+        "Mô hình Subscription (Thuê bao) đòi hỏi doanh nghiệp phải chia sẻ toàn bộ quyền sở hữu trí tuệ cho khách hàng."
+      ],
+      "correct": [3],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu D bịa đặt. Bản chất của các mô hình này là cung cấp dịch vụ thay vì bán đứt sản phẩm, thu tiền định kỳ chứ không phải chia sẻ quyền sở hữu trí tuệ."
+    },
+    {
+      "id": 24,
+      "title": "Phân biệt Kinh doanh truyền thống và Kinh doanh công nghệ số (Digital Business). Điểm khác biệt cốt lõi giữa Kinh doanh truyền thống và Kinh doanh công nghệ số là gì?",
+      "options": [
+        "Kinh doanh số yêu cầu một lượng vốn lớn để thuê cửa hàng mặt phố đắt đỏ hơn kinh doanh truyền thống.",
+        "Kinh doanh số là hình thức giao dịch trực tuyến, nơi người bán và người mua không cần gặp nhau tại cửa hàng vật lý mà trao đổi qua các nền tảng mạng xã hội hoặc sàn TMĐT.",
+        "Kinh doanh truyền thống có lợi thế về việc ứng dụng công cụ SEO và Marketing Affiliate nhanh hơn kinh doanh số.",
+        "Khách hàng trong kinh doanh công nghệ số bắt buộc phải thanh toán bằng tiền mặt khi nhận hàng."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Kinh doanh công nghệ số là hình thức trực tuyến, người bán không cần cửa hàng vật lý, trao đổi qua nền tảng như Facebook, Tiktok, Shopee, Tiki."
+    },
+    {
+      "id": 25,
+      "title": "Phân biệt Dữ liệu quy trình kinh doanh và Dữ liệu sản phẩm/dịch vụ. Phát biểu nào sau đây là SAI khi phân biệt các loại dữ liệu chiến lược trong doanh nghiệp?",
+      "options": [
+        "Dữ liệu quy trình kinh doanh bao gồm thông tin về kho hàng, chuỗi cung ứng, bán hàng và quản trị nhân sự.",
+        "Dữ liệu sản phẩm/dịch vụ có thể bao gồm dữ liệu bản đồ (như của Google) hay dữ liệu thời tiết (như của TWC).",
+        "Cả hai loại dữ liệu này đều cần được lưu trữ an toàn trong các Trung tâm dữ liệu tại chỗ hoặc Đám mây.",
+        "Dữ liệu khách hàng (như hành vi mua, nhân chủng học) được phân loại gộp chung hoàn toàn vào Dữ liệu quy trình kinh doanh."
+      ],
+      "correct": [3],
+      "explanation": "<strong>Giải thích:</strong> Dữ liệu khách hàng (mua hàng, hành vi, nhân chủng học) đứng độc lập và không gộp chung vào dữ liệu quy trình nội bộ kinh doanh (kho hàng, bán hàng)."
+    },
+    {
+      "id": 26,
+      "title": "Phân biệt Lãnh đạo số (Digital Leadership) và Nhà kỹ thuật đơn thuần (Tech Expert). Điểm khác biệt cốt lõi giải thích tại sao Lãnh đạo số phải kết hợp giữa 'Sáng tạo' và 'Kiến thức công nghệ chuyên sâu' là gì?",
+      "options": [
+        "Kiến thức công nghệ giúp lãnh đạo trực tiếp đi code phần mềm thay cho nhân viên, còn sáng tạo dùng để làm logo.",
+        "Sáng tạo mà không có công nghệ thì không thể biến ý tưởng thành hệ thống vận hành thực tế; ngược lại, giỏi công nghệ mà thiếu sáng tạo thì chỉ tối ưu quy trình cũ chứ không tạo ra được mô hình kinh doanh và giá trị mới đột phá.",
+        "Lãnh đạo số thực chất chỉ cần kiến thức công nghệ chuyên sâu, sự sáng tạo là nhiệm vụ của khách hàng.",
+        "Kiến thức công nghệ chuyên sâu giúp lãnh đạo cấm nhân viên sử dụng các phần mềm bên thứ 3."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Lãnh đạo số yêu cầu tư duy đổi mới. Ứng dụng công nghệ mà không có tư duy sáng tạo thay đổi mô hình kinh doanh thì chỉ là 'Tin học hóa' (tối ưu cách cũ), không phải CĐS."
+    },
+    {
+      "id": 27,
+      "title": "Phân biệt Số hóa (Digitization) và Số hóa hoạt động (Digitalization) trong thực tế. Phát biểu nào sau đây là SAI khi đưa ra các ví dụ phân biệt Số hóa và Số hóa quy trình?",
+      "options": [
+        "Dùng máy scan để quét hồ sơ y tế bằng giấy vào cơ sở dữ liệu máy tính là Số hóa (Digitization).",
+        "Việc quay video và ghi âm lại một cuộc họp để lưu vào máy tính là Số hóa (Digitization).",
+        "Việc chuyển hồ sơ giấy sang định dạng Excel và để nguyên trong máy tính cá nhân là đỉnh cao của Số hóa hoạt động (Digitalization).",
+        "Đưa dữ liệu lên Google Sheet để nhiều phòng ban cùng lúc truy cập, chia sẻ, hoặc dùng CRM để gửi email tự động là Số hóa hoạt động (Digitalization)."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Nhập Excel để máy cá nhân chỉ là Digitization (chuyển đổi định dạng). Digitalization đòi hỏi phần mềm cho phép nhiều người truy cập, chia sẻ và tương tác."
+    },
+    {
+      "id": 28,
+      "title": "Phân biệt CĐS Giai đoạn khởi đầu và Giai đoạn chuyển đổi mô hình (Nâng cao). Điểm khác biệt cốt lõi giữa bước số hóa ban đầu và sự chuyển đổi mô hình quản trị sâu rộng là gì?",
+      "options": [
+        "Giai đoạn khởi đầu dùng công nghệ để thay đổi hoàn toàn cách tính lương, còn giai đoạn chuyển đổi bỏ qua việc tính lương.",
+        "Giai đoạn khởi đầu chủ yếu tập trung tạo 'đòn bẩy' bằng cách số hóa quy trình cơ bản; sau đó mới áp dụng các giải pháp công nghệ toàn diện cho hệ thống báo cáo quản trị, dự báo và ngân sách.",
+        "Giai đoạn khởi đầu không cần dữ liệu, còn giai đoạn sau mới bắt đầu thu thập dữ liệu giấy.",
+        "Chuyển đổi mô hình quản trị là việc sa thải toàn bộ nhân sự thủ công để thay bằng robot ở giai đoạn khởi đầu."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Khởi đầu dùng đòn bẩy số hóa quy trình cơ bản. Chuyển đổi mô hình quản trị (giai đoạn sau) áp dụng công nghệ cho các hệ thống phức tạp hơn như báo cáo quản trị, lập kế hoạch ngân sách và dự báo."
+    },
+    {
+      "id": 29,
+      "title": "Phân biệt Thể chế là 'Định hướng' và Công nghệ là 'Công cụ'. Phát biểu nào sau đây là SAI khi phân tích mối quan hệ giữa Thể chế và Công nghệ trong CĐS?",
+      "options": [
+        "Công nghệ (AI, Big Data, Cloud) dù phát triển đến đâu cũng chỉ đóng vai trò là công cụ mang tính thực thi.",
+        "Công nghệ có khả năng tự thay đổi luật pháp quốc gia mà không cần sự can thiệp của bộ máy nhà nước.",
+        "Các thể chế và chính sách mới là nhân tố quyết định việc thúc đẩy, tăng cường hay cản trở quá trình CĐS.",
+        "Nếu thể chế không được đổi mới (ví dụ không cho phép chữ ký điện tử), công nghệ có hiện đại đến đâu cũng không thể phát huy hiệu quả thực tế."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Chuyển đổi số là cuộc cách mạng về thể chế nhiều hơn công nghệ. Công nghệ không thể tự thay đổi luật pháp. Thể chế/chính sách mới là nhân tố quyết định, công nghệ chỉ là công cụ."
+    },
+    {
+      "id": 30,
+      "title": "Phân biệt Giao tiếp kỹ thuật số và Kiến tạo tri thức (Khung DigComp/ISTE). Điểm khác biệt cốt lõi giữa kỹ năng 'Giao tiếp' và 'Kiến tạo tri thức' trong năng lực kỹ thuật số là gì?",
+      "options": [
+        "Giao tiếp là kỹ năng tạo ra phần mềm diệt virus; Kiến tạo tri thức là việc bán phần mềm đó.",
+        "Giao tiếp tập trung vào các chiến lược tương tác chuẩn mực, hợp tác qua mạng (ví dụ gọi video an toàn); còn Kiến tạo tri thức là khả năng đánh giá, chọn lọc độ tin cậy của thông tin trên mạng để tổng hợp thành tri thức hợp lý.",
+        "Giao tiếp yêu cầu người dùng phải biết lập trình; Kiến tạo tri thức yêu cầu biết sử dụng mạng xã hội.",
+        "Hai kỹ năng này hoàn toàn giống nhau và có thể thay thế cho nhau trong môi trường số."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Giao tiếp: Tương tác chuẩn mực, gọi video an toàn. Kiến tạo tri thức: Đánh giá thông tin để kiến tạo tri thức hợp lý. Đây là 2 kỹ năng tách biệt."
+    },
+    {
+      "id": 31,
+      "title": "Phân biệt Yếu tố Con người và Yếu tố Công nghệ trong CĐS. Phát biểu nào sau đây là SAI khi so sánh vai trò của yếu tố con người và công nghệ trong sự thành bại của CĐS?",
+      "options": [
+        "Yếu tố con người là yếu tố quan trọng và quyết định nhất vì CĐS bản chất là sự chuyển đổi của con người.",
+        "Công nghệ là yếu tố tiên quyết, có khả năng thay thế hoàn toàn vai trò nhận thức của ban lãnh đạo.",
+        "Nhận thức của lãnh đạo đóng vai trò hàng đầu để có định hướng chiến lược đúng đắn.",
+        "Công nghệ chỉ là điều kiện cần và quyết định chất lượng của CĐS thông qua các hạ tầng và nền tảng số."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Công nghệ không thể thay thế nhận thức của con người/lãnh đạo. Yếu tố con người mang tính quyết định nhất."
+    },
+    {
+      "id": 32,
+      "title": "Phân biệt Dữ liệu khách hàng Nguồn rõ ràng (Explicit) và Nguồn ẩn (Implicit). Phát biểu nào sau đây là SAI khi phân biệt nguồn thông tin rõ ràng và nguồn thông tin ẩn từ khách hàng?",
+      "options": [
+        "Nguồn rõ ràng thu thập qua các bảng hỏi, khảo sát trực tiếp từ khách hàng.",
+        "Nguồn ẩn thu thập qua hành vi thực tế như thời gian xem trang, lịch sử click chuột.",
+        "Nguồn rõ ràng luôn có giá trị cao và độ chính xác tuyệt đối hơn nguồn ẩn vì đó là câu trả lời trực tiếp của người dùng.",
+        "Nguồn ẩn được ví như 'mỏ vàng' cho AI phân tích vì hành vi vô thức của khách hàng không biết nói dối."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Khách hàng có thể 'nói dối' trong phiếu khảo sát (nguồn rõ), nhưng hành vi vô thức (nguồn ẩn) thì không biết nói dối. Nguồn ẩn có giá trị gấp nhiều lần."
+    },
+    {
+      "id": 33,
+      "title": "Phân biệt Chuyển đổi số 'Tổng thể' và Chuyển đổi số 'Toàn diện'. Điểm khác biệt cốt lõi giữa tính 'Tổng thể' và tính 'Toàn diện' trong CĐS là gì?",
+      "options": [
+        "Tổng thể là chuyển đổi áp dụng cho lãnh đạo, toàn diện là áp dụng cho nhân viên.",
+        "Tổng thể nghĩa là tiến hành CĐS ở mọi bộ phận trong doanh nghiệp; Toàn diện nghĩa là CĐS ở mọi mặt (mọi khía cạnh) của một bộ phận đó.",
+        "Tổng thể là việc mua sắm toàn bộ thiết bị phần cứng, toàn diện là việc mua sắm toàn bộ phần mềm.",
+        "Hai khái niệm này là một và có thể sử dụng thay thế cho nhau."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Định nghĩa rất rạch ròi: Tổng thể = CĐS mọi bộ phận. Toàn diện = CĐS mọi mặt của bộ phận."
+    },
+    {
+      "id": 34,
+      "title": "Phân biệt Đặc tính Phân cấp (Decentralization) và Đồng thuận (Consensus) trong Blockchain. Phát biểu nào sau đây là SAI khi phân biệt các đặc tính cốt lõi của công nghệ Chuỗi khối?",
+      "options": [
+        "Phân cấp có nghĩa là không một cá nhân hay tổ chức nào có toàn quyền kiểm soát thông tin đi vào hệ thống.",
+        "Đồng thuận là đặc tính cho phép một máy chủ trung tâm duy nhất tự động ra quyết định phê duyệt dữ liệu.",
+        "Nhờ tính đồng thuận, nhiều bên khác nhau cùng lưu trữ bản sao gốc và đa số phải đồng ý thì dữ liệu mới được thêm vào.",
+        "Đặc tính 'Chỉ thêm' (Append-only) kết hợp với 'Đồng thuận' giúp dữ liệu mới không thể xung đột với dữ liệu cũ."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Đồng thuận trong Blockchain yêu cầu nhiều bên cùng phê duyệt (đa số đồng ý), không phải là máy chủ trung tâm duy nhất (điều đó đi ngược với phân cấp)."
+    },
+    {
+      "id": 35,
+      "title": "Phân biệt Vai trò Lãnh đạo là 'Tác nhân' và Lãnh đạo là 'Đối tượng' CĐS. Điểm khác biệt cốt lõi khi coi lãnh đạo là 'Đối tượng' của CĐS so với các cuộc cải tổ truyền thống là gì?",
+      "options": [
+        "Lãnh đạo truyền thống chỉ là người ra lệnh, còn lãnh đạo CĐS bị thay thế bởi robot.",
+        "Khác với các thay đổi thông thường nơi lãnh đạo chỉ là tác nhân, trong CĐS, bản thân tư duy, kỹ năng số và phong cách quản trị của chính người lãnh đạo cũng bắt buộc phải được chuyển đổi (đối tượng).",
+        "Trở thành đối tượng của CĐS nghĩa là lãnh đạo phải tự mình đi học code để viết phần mềm cho công ty.",
+        "Lãnh đạo là đối tượng CĐS nên họ không cần tham gia định hướng chiến lược nữa."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Số hóa các cấp lãnh đạo là yêu cầu cần thiết, họ mang cả hai vai trò: vừa tạo ra sự thay đổi (tác nhân), vừa phải thay đổi tư duy và phong cách (đối tượng)."
+    },
+    {
+      "id": 36,
+      "title": "Phân biệt Nền tảng làm việc Nội bộ và Nền tảng làm việc Khách hàng/Đối tác. Phát biểu nào sau đây là SAI khi phân biệt các nhóm hạ tầng công nghệ số?",
+      "options": [
+        "Nền tảng làm việc nội bộ giúp tiết kiệm thời gian quản lý tài liệu và tăng năng suất nhân sự.",
+        "Hệ thống CRM dùng để thu thập thông tin và phục vụ nhu cầu khách hàng được xếp vào nền tảng nội bộ.",
+        "Nền tảng làm việc với khách hàng/đối tác giúp doanh nghiệp đáp ứng mong muốn của khách hàng nhanh chóng hơn.",
+        "Cả hai nhóm nền tảng này đều phải được thiết kế xoay quanh các ưu tiên kinh doanh của tổ chức."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> CRM là công cụ hướng tới khách hàng nên thuộc nhóm nền tảng làm việc với khách hàng, không phải nền tảng làm việc nội bộ."
+    },
+    {
+      "id": 37,
+      "title": "Phân biệt Giai đoạn 'Mở rộng' và 'Hoàn tất' trong lộ trình CĐS. Điểm khác biệt cốt lõi giữa Giai đoạn mở rộng CĐS và Giai đoạn hoàn tất CĐS là gì?",
+      "options": [
+        "Giai đoạn mở rộng triển khai riêng lẻ không kết nối, còn hoàn tất mới bắt đầu dùng máy tính.",
+        "Giai đoạn mở rộng tập trung vào CĐS mô hình quản trị và áp dụng công nghệ số rộng rãi; trong khi Giai đoạn hoàn tất đạt đến mức liên kết dữ liệu xuyên suốt toàn bộ hệ thống và chuyển đổi hoàn toàn cả mô hình kinh doanh lẫn quản trị.",
+        "Giai đoạn mở rộng tập trung vào việc áp dụng công nghệ đám mây, còn hoàn tất yêu cầu phải sử dụng Blockchain.",
+        "Giai đoạn mở rộng bỏ qua trải nghiệm khách hàng để tập trung quản trị, còn hoàn tất làm ngược lại."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Giai đoạn hoàn tất CĐS đòi hỏi sự thu thập và liên kết dữ liệu xuyên suốt, chuyển đổi hoàn toàn mô hình kinh doanh và quản trị."
+    },
+    {
+      "id": 38,
+      "title": "Phân biệt Dữ liệu Khách hàng và Dữ liệu Quy trình kinh doanh. Phát biểu nào sau đây là SAI khi phân loại các nhóm dữ liệu chiến lược của doanh nghiệp?",
+      "options": [
+        "Dữ liệu quy trình kinh doanh giúp quản lý, tối ưu hóa hoạt động và giảm rủi ro, ví dụ như số liệu kho hàng, thanh toán.",
+        "Dữ liệu quy trình kinh doanh bao gồm cả thông tin về nhân chủng học và bình luận đánh giá của khách hàng.",
+        "Dữ liệu khách hàng cho phép doanh nghiệp cá nhân hóa các tương tác và cung cấp bức tranh hoàn thiện về người tiêu dùng.",
+        "Dữ liệu sản phẩm/dịch vụ (như dữ liệu thời tiết, bản đồ) giúp cung cấp tuyên bố giá trị của sản phẩm."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Thông tin nhân chủng học và bình luận đánh giá thuộc về Dữ liệu khách hàng, không nằm trong Dữ liệu quy trình kinh doanh (chỉ gồm kho hàng, bán hàng, thanh toán...)."
+    },
+    {
+      "id": 39,
+      "title": "Phân biệt Chính sách phát triển Hạ tầng số Bên cung và Bên cầu. Điểm khác biệt cốt lõi giữa chính sách hạ tầng số tác động đến bên cung và bên cầu là gì?",
+      "options": [
+        "Bên cung quản lý việc cấp phát ngân sách cho startup, bên cầu đánh thuế người dùng.",
+        "Bên cung tập trung vào các quy định mạng, phân bổ phổ tần số và băng thông rộng quốc gia; trong khi bên cầu tập trung vào quy định khởi tạo/chia sẻ nội dung số và bảo vệ quyền riêng tư của người dùng.",
+        "Bên cung yêu cầu người dân cam kết dùng 5G, bên cầu yêu cầu doanh nghiệp phát mạng miễn phí.",
+        "Hai chính sách này hoàn toàn độc lập và không thể áp dụng đồng thời."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Chính sách bên cung gồm băng thông rộng, quy định mạng, tần số. Bên cầu tác động đến người dùng: quy định đăng tải/chia sẻ nội dung và bảo vệ dữ liệu cá nhân."
+    },
+    {
+      "id": 40,
+      "title": "Phân biệt Quy mô Doanh nghiệp Nhỏ và Vừa (Theo Nghị định 39 & 80). Phát biểu nào sau đây là SAI khi phân biệt quy mô doanh nghiệp trong lĩnh vực Thương mại/Dịch vụ?",
+      "options": [
+        "Doanh nghiệp siêu nhỏ, nhỏ hay vừa đều là các đối tượng phù hợp và cần thiết phải tiến hành chuyển đổi số.",
+        "Doanh nghiệp vừa trong lĩnh vực thương mại dịch vụ có số lượng nhân sự từ 200 người trở xuống.",
+        "Doanh nghiệp nhỏ trong lĩnh vực thương mại dịch vụ có số lượng nhân sự từ 50 người trở xuống và doanh thu từ 100 tỷ trở xuống.",
+        "Doanh nghiệp lớn được định nghĩa là doanh nghiệp có số nhân sự lớn hơn 300 người (không xét lĩnh vực TM-DV)."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Trong lĩnh vực TM-DV, doanh nghiệp vừa được định nghĩa là nhân sự từ 100 người trở xuống. (Con số 200 người áp dụng cho lĩnh vực khác)."
+    },
+    {
+      "id": 41,
+      "title": "Phân biệt Tối ưu hóa vận hành nội bộ và Chuyển đổi sản xuất (Mô hình Quản trị). Điểm khác biệt cốt lõi giữa 'Tối ưu hóa vận hành nội bộ' và 'Chuyển đổi sản xuất' là gì?",
+      "options": [
+        "Vận hành nội bộ tập trung vào bộ phận R&D, còn sản xuất tập trung vào bộ phận Marketing.",
+        "Vận hành nội bộ hướng tới xây dựng môi trường làm việc số cho các khối hỗ trợ như nhân sự, kế toán; trong khi Chuyển đổi sản xuất nhắm vào việc nâng cao hiệu suất máy móc thiết bị, kết nối chuỗi giá trị và giảm rủi ro tuân thủ giao hàng.",
+        "Vận hành nội bộ áp dụng tại các nhà máy, còn chuyển đổi sản xuất áp dụng tại trụ sở văn phòng.",
+        "Cả hai hoạt động đều không yêu cầu tích hợp phần mềm mà chỉ cần cải tổ nhân sự."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Vận hành nội bộ tạo môi trường số cho khối hành chính nhân sự, kế toán. Chuyển đổi sản xuất tập trung cải tiến hiệu suất tại nhà máy, thiết bị thời gian thực."
+    },
+    {
+      "id": 42,
+      "title": "Phân biệt Vòng đời Khách hàng: Giai đoạn 'Thu hút' và 'Phát triển quan hệ'. Phát biểu nào sau đây là SAI khi phân biệt các giai đoạn trong Vòng đời khách hàng?",
+      "options": [
+        "Ở giai đoạn 'Thu hút', doanh nghiệp sử dụng content (blog, video) để giải quyết vấn đề của khách hàng thay vì chỉ hô hào quảng cáo sản phẩm tốt.",
+        "Mục đích của giai đoạn 'Thu hút' là biến những người chưa biết đến sản phẩm thành khách hàng tiềm năng.",
+        "Giai đoạn 'Phát triển quan hệ' diễn ra trước khi khách hàng thanh toán mua hàng để thuyết phục họ rút ví.",
+        "Giai đoạn 'Phát triển quan hệ' được thực hiện sau khi khách hàng đã mua hàng, nhằm đảm bảo họ được thỏa mãn hoàn toàn, làm tiền đề cho sự trung thành."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Giai đoạn 'Phát triển mối quan hệ' luôn diễn ra SAU KHÂU MUA HÀNG nhằm đảm bảo thoả mãn khách hàng, tiến tới sự trung thành."
+    },
+    {
+      "id": 43,
+      "title": "Phân biệt Chiến lược cấp công ty và Chiến lược kinh doanh tổng quát. Phát biểu nào sau đây là SAI khi phân loại chiến lược của doanh nghiệp?",
+      "options": [
+        "Chiến lược cường độ thuộc nhóm Chiến lược cấp công ty.",
+        "Chiến lược dẫn đạo chi phí thuộc nhóm Chiến lược kinh doanh tổng quát.",
+        "Chiến lược đa dạng hóa thuộc nhóm Chiến lược kinh doanh tổng quát.",
+        "Chiến lược khác biệt hóa thuộc nhóm Chiến lược kinh doanh tổng quát."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Chiến lược đa dạng hóa thuộc nhóm Chiến lược cấp công ty, không phải Chiến lược kinh doanh tổng quát."
+    },
+    {
+      "id": 44,
+      "title": "Phân biệt Dịch vụ Hạ tầng viễn thông/Mạng và Dịch vụ Đám mây (Cloud). Điểm khác biệt cốt lõi giữa hai nhóm nền tảng công nghệ này là gì?",
+      "options": [
+        "Mạng 4G/5G cung cấp không gian lưu trữ vô hạn, còn Cloud cung cấp tần số vô tuyến.",
+        "Mạng viễn thông (4G, 5G, Wifi) cung cấp khả năng kết nối và truyền tải dữ liệu liền mạch giữa các thiết bị; trong khi Điện toán đám mây cung cấp hạ tầng máy chủ ảo và môi trường tính toán, lưu trữ tài nguyên trên internet.",
+        "Cloud chỉ áp dụng được trên máy tính bàn, còn 5G chỉ dùng cho điện thoại.",
+        "Doanh nghiệp bắt buộc phải có AWS thì mới phát được sóng Wifi nội bộ."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Mạng giúp kết nối và truyền tải dữ liệu. Dịch vụ đám mây cung cấp năng lực lưu trữ, máy chủ từ xa giảm thiểu việc xây Data Center vật lý."
+    },
+    {
+      "id": 45,
+      "title": "Phân biệt Chỉ số Quản trị Công nghệ và Chỉ số Vận hành Dịch vụ (Bộ chỉ số DBI). Phát biểu nào sau đây là SAI khi phân biệt các chỉ số thuộc Trụ cột Hạ tầng & Công nghệ số (DBI)?",
+      "options": [
+        "Chỉ số Quản trị công nghệ đánh giá việc doanh nghiệp có khung giám sát công nghệ, quan tâm đến môi trường và tiêu chuẩn ngành hay không.",
+        "Chỉ số Vận hành dịch vụ đánh giá khả năng chuỗi cung ứng linh hoạt và độ tin cậy của dịch vụ cung cấp.",
+        "Tiêu chí 'Áp dụng Công nghệ Kỹ thuật số để ngăn ngừa gian lận' thuộc về Chỉ số Quản trị công nghệ.",
+        "Cả hai chỉ số này đều nằm trong Trụ cột Hạ tầng và Công nghệ số gồm tổng cộng 29 tiêu chí."
+      ],
+      "correct": [2],
+      "explanation": "<strong>Giải thích:</strong> Tiêu chí 'Ngăn ngừa gian lận' thuộc Chỉ số Vận hành dịch vụ, không phải Quản trị công nghệ."
+    },
+    {
+      "id": 46,
+      "title": "Phân biệt Khái niệm 'Kỹ thuật số' (theo định nghĩa McKinsey) và 'Tin học hóa'. Phát biểu nào sau đây là SAI về cốt lõi của 'Kỹ thuật số' theo định nghĩa của McKinsey?",
+      "options": [
+        "Kỹ thuật số không đơn thuần là một quy trình kỹ thuật mà là cách thức các công ty điều hành hoạt động kinh doanh của họ.",
+        "Kỹ thuật số chỉ xoay quanh việc mua sắm máy tính và tạo ra các thư mục lưu trữ dữ liệu thay cho tủ hồ sơ gỗ.",
+        "Nó bao gồm việc tạo ra giá trị mới ở những biên giới mới của thế giới kinh doanh.",
+        "Nó đòi hỏi xây dựng các khả năng nền tảng để hỗ trợ toàn bộ sáng kiến kinh doanh tổng thể."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Phát biểu B miêu tả bước số hóa vật lý (Digitization). Kỹ thuật số theo McKinsey tập trung vào tạo giá trị mới, tối ưu quy trình trải nghiệm và xây nền tảng."
+    },
+    {
+      "id": 47,
+      "title": "Phân biệt Chỉ số Kỹ thuật dữ liệu và Hiện thực hóa giá trị dữ liệu (DBI). Điểm khác biệt cốt lõi giữa hai chỉ số cấu thành Trụ cột Dữ liệu này là gì?",
+      "options": [
+        "Kỹ thuật dữ liệu tập trung vào việc mã hóa dữ liệu thành văn bản in, còn hiện thực hóa giá trị là đem bán văn bản đó.",
+        "Kỹ thuật dữ liệu đánh giá khâu 'bếp núc' (phân loại, lưu trữ, đảm bảo toàn vẹn và xóa dữ liệu); trong khi Hiện thực hóa giá trị đánh giá khâu 'đầu ra' (dữ liệu có được dùng để ra quyết định và tối ưu hoạt động thực tế hay không).",
+        "Kỹ thuật dữ liệu chỉ do AI thực hiện, còn hiện thực hóa do con người thực hiện.",
+        "Cả hai chỉ số đều không thuộc Bộ chỉ số đo lường mức độ CĐS (DBI)."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Kỹ thuật dữ liệu tập trung bảo vệ toàn vẹn, phân loại dữ liệu. Hiện thực hóa giá trị đánh giá xem các quyết định có được đưa ra dựa trên dữ liệu để tạo doanh thu/tối ưu hay không."
+    },
+    {
+      "id": 48,
+      "title": "Phân biệt Cơ sở dữ liệu CĐS Nông nghiệp và CĐS Giáo dục. Phát biểu nào sau đây là SAI khi lấy ví dụ phân biệt ứng dụng CSDL Quốc gia giữa các ngành?",
+      "options": [
+        "Trong Nông nghiệp, CĐS giúp phát triển trang trại thông minh, dự báo sản xuất qua dữ liệu đo đạc.",
+        "CSDL Nông nghiệp cần sự liên thông cập nhật từ cấp xã lên huyện, tỉnh và bộ.",
+        "Trong Giáo dục, CSDL giúp quản lý chi tiết hàng chục triệu học sinh, trường lớp và điểm số cuối kỳ.",
+        "Ứng dụng CĐS trong cả 2 ngành này đều bắt buộc phải công khai toàn bộ dữ liệu cá nhân của người dùng lên internet mở để toàn dân tự do chỉnh sửa."
+      ],
+      "correct": [3],
+      "explanation": "<strong>Giải thích:</strong> CSDL Giáo dục và Nông nghiệp là các tài nguyên dùng chung hoặc phân quyền chặt chẽ, không bao giờ được phép cho 'toàn dân tự do chỉnh sửa'."
+    },
+    {
+      "id": 49,
+      "title": "Phân biệt Tư duy phát triển sản phẩm truyền thống và Tư duy Tinh gọn/Thiết kế (Lean & Design Thinking). Điểm khác biệt cốt lõi trong khâu phát triển sản phẩm giữa thời đại cũ và kỷ nguyên số là gì?",
+      "options": [
+        "Thời đại cũ khách hàng không có nhu cầu mua sắm, kỷ nguyên số khách hàng mua sắm nhiều hơn.",
+        "Thời đại cũ sản phẩm phải được hoàn thiện bí mật 100% rồi mới tung ra thị trường; kỷ nguyên số phát triển sản phẩm qua nhiều vòng lặp, tạo phiên bản khả thi tối thiểu (MVP) và mời khách hàng dùng thử, phản hồi sớm.",
+        "Tư duy tinh gọn (Lean) yêu cầu doanh nghiệp phải cắt giảm toàn bộ đội ngũ thiết kế sản phẩm.",
+        "Tư duy thiết kế số yêu cầu mọi sản phẩm phải được bọc trong bao bì điện tử."
+      ],
+      "correct": [1],
+      "explanation": "<strong>Giải thích:</strong> Trong thời đại số, thiết kế và phát triển thông qua các vòng lặp thử nghiệm nhanh (MVP) để mời khách hàng tham gia phản hồi sớm, giảm thiệt hại đầu tư (fail fast, learn quickly)."
+    },
+    {
+      "id": 50,
+      "title": "Phân biệt Niềm tin Chuyển đổi số và Kỹ năng số. Phát biểu nào sau đây là SAI khi phân biệt 'Niềm tin CĐS' và 'Kỹ năng số'?",
+      "options": [
+        "Kỹ năng số là khả năng cá nhân sử dụng, tương tác an toàn với các công nghệ và nền tảng số.",
+        "Niềm tin chuyển đổi số là sự đánh giá, tin tưởng của người dân/doanh nghiệp vào mức độ an toàn, bảo mật và trách nhiệm của nền tảng.",
+        "Hệ thống đánh giá tín nhiệm số và bộ quy tắc ứng xử trên môi trường mạng là các công cụ để xây dựng Niềm tin CĐS.",
+        "Kỹ năng số và Niềm tin CĐS là hai thuật ngữ đồng nghĩa, khi có kỹ năng dùng máy tính thì mặc định có niềm tin tuyệt đối vào không gian mạng."
+      ],
+      "correct": [3],
+      "explanation": "<strong>Giải thích:</strong> Kỹ năng số và Niềm tin CĐS không đồng nghĩa. Giỏi dùng công cụ (Kỹ năng) không đồng nghĩa với việc bạn tin tưởng nền tảng đó an toàn (Niềm tin). Việc xây dựng niềm tin yêu cầu cơ chế tín nhiệm."
+    }
   ];
 
-  // Logic trộn
+  let quizzes = [
+    { id: "default_1", name: "Bộ đề 1 (Chuyển đổi số - 50 Câu)", data: defaultData }
+  ];
+  let currentQuizId = "default_1";
+  let activeQuestions = [];
+
   function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
+    let array = [...arr];
+    for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+      [array[i], array[j]] = [array[j], array[i]];
     }
-    return arr;
+    return array;
   }
 
-  const questions = shuffle([...rawData]).map(q => {
-    const indices = q.options.map((_, i) => i);
-    const shuffledIdx = shuffle(indices);
-    return {
-      ...q,
-      options: shuffledIdx.map(i => q.options[i]),
-      correct: q.correct.map(c => shuffledIdx.indexOf(c))
-    };
-  });
+  function loadActiveQuiz() {
+    const quiz = quizzes.find(q => q.id === currentQuizId);
+    document.getElementById('quizTitle').innerText = `📝 ${quiz.name}`;
+    document.getElementById('totalQuestions').innerText = quiz.data.length;
+    
+    document.getElementById('correctCount').innerText = "0";
+    document.getElementById('livePoints').innerText = "0.00";
 
-  // Render UI
-  function render() {
+    activeQuestions = shuffle(quiz.data).map(q => {
+      const indices = q.options.map((_, i) => i);
+      const shuffledIdx = shuffle(indices);
+      return {
+        ...q,
+        options: shuffledIdx.map(i => q.options[i]),
+        correct: q.correct.map(c => shuffledIdx.indexOf(c))
+      };
+    });
+
+    renderUI();
+  }
+
+  function renderQuizSelector() {
+    const selector = document.getElementById('quizSelector');
+    selector.innerHTML = quizzes.map(q => `<option value="${q.id}" ${q.id === currentQuizId ? 'selected' : ''}>${q.name}</option>`).join('');
+  }
+
+  function switchQuiz() {
+    currentQuizId = document.getElementById('quizSelector').value;
+    loadActiveQuiz();
+  }
+
+  window.resetCurrentQuiz = function() {
+    loadActiveQuiz();
+  }
+
+  window.handleFileUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const uploadedData = JSON.parse(e.target.result);
+        if (!Array.isArray(uploadedData) || uploadedData.length === 0 || !uploadedData[0].options) {
+            throw new Error("Cấu trúc JSON không hợp lệ.");
+        }
+        const newId = "quiz_" + Date.now();
+        const baseName = file.name.replace('.json', '');
+        const newName = `${baseName} - Bộ đề ${quizzes.length + 1}`;
+        
+        quizzes.push({ id: newId, name: newName, data: uploadedData });
+        currentQuizId = newId; 
+        renderQuizSelector();
+        loadActiveQuiz();
+        document.getElementById('jsonUpload').value = "";
+        alert(`Đã thêm thành công: ${newName}`);
+      } catch (err) {
+        alert("Lỗi khi đọc file JSON: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function renderUI() {
     const container = document.getElementById('quizContainer');
-    container.innerHTML = questions.map((q, i) => `
+    container.innerHTML = activeQuestions.map((q, i) => `
       <div class="question-card" id="card-${i}">
         <div class="q-header">
           <div style="display: flex; gap: 12px; align-items: flex-start;">
@@ -284,21 +833,23 @@
         <button class="submit-q-btn" id="btn-${i}" onclick="submitQuestion(${i})">
           🚀 Nộp bài câu này
         </button>
+        
+        <div class="explanation-box" id="expl-${i}">
+            ${q.explanation ? q.explanation : "<em>Không có giải thích cụ thể cho câu hỏi này.</em>"}
+        </div>
       </div>
     `).join('');
   }
 
-  // Xử lý nộp bài cho từng câu
   window.submitQuestion = function(qIdx) {
-    const q = questions[qIdx];
+    const q = activeQuestions[qIdx];
     const correctSet = new Set(q.correct);
     const selected = [];
     
-    // Thu thập đáp án người dùng chọn
     q.options.forEach((_, optIdx) => {
       const cb = document.getElementById(`check-${qIdx}-${optIdx}`);
       if(cb.checked) selected.push(optIdx);
-      cb.disabled = true; // Khóa input sau khi nộp
+      cb.disabled = true;
     });
 
     if (selected.length === 0) {
@@ -310,11 +861,11 @@
     const card = document.getElementById(`card-${qIdx}`);
     const badge = document.getElementById(`badge-${qIdx}`);
     const btn = document.getElementById(`btn-${qIdx}`);
+    const explBox = document.getElementById(`expl-${qIdx}`);
     
     btn.disabled = true;
     btn.innerText = "🔒 Đã chấm điểm";
 
-    // Hiển thị đáp án đúng/sai trên từng option
     q.options.forEach((_, optIdx) => {
       const label = document.getElementById(`label-${qIdx}-${optIdx}`);
       const isCorrect = correctSet.has(optIdx);
@@ -327,7 +878,6 @@
       }
     });
 
-    // Tính toán kết quả cho câu hỏi
     const hasWrong = selected.some(s => !correctSet.has(s));
     const correctCount = selected.filter(s => correctSet.has(s)).length;
     const isPerfect = (correctCount === correctSet.size) && !hasWrong;
@@ -344,6 +894,7 @@
       badge.innerHTML = `<span class="status-badge" style="background:#fffbeb; color:#f59e0b;">Thiếu (${p}đ)</span>`;
     }
 
+    explBox.style.display = "block";
     updateHeaderStats();
   };
 
@@ -351,9 +902,9 @@
     let totalPoints = 0;
     let perfectCount = 0;
 
-    questions.forEach((q, i) => {
+    activeQuestions.forEach((q, i) => {
       const btn = document.getElementById(`btn-${i}`);
-      if (btn && btn.disabled) { // Chỉ tính những câu đã nộp
+      if (btn && btn.disabled) {
         const correctSet = new Set(q.correct);
         const selected = [];
         q.options.forEach((_, optIdx) => {
@@ -373,7 +924,8 @@
     document.getElementById('livePoints').innerText = totalPoints.toFixed(2);
   }
 
-  render();
+  renderQuizSelector();
+  loadActiveQuiz();
 </script>
 
 </body>
