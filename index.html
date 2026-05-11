@@ -1,237 +1,307 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trắc Nghiệm Mạng Máy Tính</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-        #sticky-header {
-            position: sticky;
-            top: 0;
-            background-color: #ffffff;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-        }
-        .score-board {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        .score-board span {
-            color: #27ae60;
-            font-size: 1.4rem;
-        }
-        button.reset-btn {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        button.reset-btn:hover {
-            background-color: #2980b9;
-        }
-        #quiz-container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-        .question-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-        .question-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .option {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            background-color: #fafafa;
-        }
-        .option:hover:not(.disabled) {
-            border-color: #3498db;
-            background-color: #f0f8ff;
-        }
-        .option.correct {
-            background-color: #d4edda !important;
-            border-color: #28a745 !important;
-            color: #155724 !important;
-        }
-        .option.incorrect {
-            background-color: #f8d7da !important;
-            border-color: #dc3545 !important;
-            color: #721c24 !important;
-        }
-        .option.disabled {
-            cursor: not-allowed;
-            opacity: 0.8;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
+  <title>60 câu ôn tập DBMS - Học tập Real-time</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f4f7fc;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      padding: 20px;
+      padding-top: 100px; /* Tạo khoảng trống cho thanh sticky */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* THANH ĐIỂM CỐ ĐỊNH */
+    .sticky-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #1e6f9f;
+      color: white;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .header-content {
+      max-width: 1000px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .live-score {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 20px;
+      border-radius: 50px;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      padding: 30px 25px;
+      margin-bottom: 30px;
+    }
+    h1 {
+      font-size: 1.8rem;
+      color: #0b2b4f;
+      border-bottom: 3px solid #1e6f9f;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .question-card {
+      background: #ffffff;
+      border: 2px solid #e0e7f0;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    /* TRẠNG THÁI MÀU SẮC */
+    .wrong-card { border-color: #dc2626; background: #fff5f5; }
+    .partial-card { border-color: #f59e0b; background: #fffdf5; }
+    .correct-card { border-color: #10b981; background: #f0fdf6; }
+
+    .q-title { font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+    .q-num {
+      background: #1e6f9f; color: white; width: 30px; height: 30px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 8px; }
+    .option-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 15px; border-radius: 10px; background: #f9fbfd;
+      border: 1px solid transparent; transition: 0.2s;
+    }
+
+    /* ĐÁNH DẤU ĐÚNG SAI TRÊN OPTION */
+    .correct-marker { background: #e6f7e6 !important; border-left: 5px solid #2e7d32 !important; font-weight: 600; }
+    .user-wrong-marker { background: #fee2e2 !important; border-left: 5px solid #dc2626 !important; }
+
+    pre {
+      background: #1e293b; color: #e2e8f0; padding: 12px;
+      border-radius: 8px; font-size: 0.85rem; margin: 10px 0; overflow-x: auto;
+    }
+
+    button {
+      background: #4b5563; color: white; border: none; padding: 10px 20px;
+      border-radius: 20px; cursor: pointer; font-weight: 600;
+    }
+    button:hover { background: #374151; }
+
+    @media (max-width: 600px) {
+      .header-content { flex-direction: column; gap: 10px; }
+      .live-score { font-size: 1rem; }
+    }
+  </style>
 </head>
 <body>
 
-    <div id="sticky-header">
-        <div class="score-board">Câu đúng: <span id="correct-score">0</span> / <span id="total-score">45</span></div>
-        <button class="reset-btn" onclick="initQuiz()">Tạo lại bộ đề</button>
+<div class="sticky-header">
+  <div class="header-content">
+    <div style="font-weight: 800; letter-spacing: 1px;">DBMS QUIZ MODE</div>
+    <div class="live-score">
+      ✅ Đúng: <span id="correctCount">0</span> / 60 | 📊 Điểm: <span id="livePoints">0.00</span>
     </div>
+    <button onclick="location.reload()">🔄 Đảo câu & Làm lại</button>
+  </div>
+</div>
 
-    <div id="quiz-container"></div>
+<div class="container">
+  <h1>🗄️ Ôn tập Hệ quản trị CSDL</h1>
+  <div id="quizContainer"></div>
+</div>
 
-    <script>
-        const rawQuestions = [
-            { q: "What is the standard size of the header in a UDP segment?", correct: "8 bytes", incorrect: ["12 bytes", "40 bytes", "20 bytes"] },
-            { q: "Which layer in the Internet protocol stack is responsible for supporting network applications like HTTP and SMTP?", correct: "Application layer", incorrect: ["Transport layer", "Network layer", "Link layer"] },
-            { q: "In TCP, the Maximum Segment Size (MSS) refers to:", correct: "The maximum amount of application-layer data in a segment", incorrect: ["The maximum number of segments allowed in a single connection", "The total length of the segment including the TCP header", "The size of the physical link-layer frame (MTU)"] },
-            { q: "The job of the physical layer is to:", correct: "Move individual bits within a frame from one node to the next", incorrect: ["Manage the interaction between application processes", "Detect bit errors in a transport-layer segment", "Route datagrams from source to destination"] },
-            { q: "What is a key difference between Selective Repeat (SR) and Go-Back-N (GBN)?", correct: "SR can buffer out-of-order packets; GBN usually discards them", incorrect: ["GBN provides reliable delivery; SR provides only best-effort service", "GBN allows for larger sequence numbers than SR", "SR uses a single timer for the entire window; GBN uses one per packet"] },
-            { q: "Which mechanism was introduced in protocol rdt 2.1 to solve the problem of corrupted ACKs or NAKs?", correct: "Sequence numbers for data packets", incorrect: ["A countdown timer for every sent packet", "A larger checksum for control packets", "Pipelining multiple packets in flight"] },
-            { q: "In the context of Reliable Data Transfer (RDT), what does 'Stop-and-Wait' mean?", correct: "The sender sends one packet and waits for an ACK before sending the next", incorrect: ["The receiver stops all traffic if it detects a bit error", "The router drops packets when its buffer is completely full", "The application waits for 1 RTT before initializing a socket"] },
-            { q: "What is a 'cumulative acknowledgment' in the Go-Back-N (GBN) protocol?", correct: "An ACK(n) that confirms all packets up to and including n have been received", incorrect: ["A single NAK that identifies all lost packets in the window", "A timer that accumulates RTT samples to estimate timeout", "An ACK that must be sent twice for every received packet"] },
-            { q: "If the current EstimatedRTT is 100ms and a new SampleRTT is 200ms, assuming alpha = 0.125, the new EstimatedRTT will be:", correct: "112.5ms", incorrect: ["125ms", "187.5ms", "150ms"] },
-            { q: "A TCP socket is uniquely identified by which of the following?", correct: "Source IP, Source Port, Dest IP, Dest Port", incorrect: ["IP address and Ethernet Type field", "Destination IP and Destination Port only", "Source MAC address and Sequence Number"] },
-            { q: "What is a 'protocol' in computer networking?", correct: "Rules that define the format and order of messages sent and received", incorrect: ["A specific type of high-speed physical link", "A hardware device used to interconnect different networks", "A programming language used to build web applications"] },
-            { q: "Which protocol is standardly used to retrieve email from a mail server?", correct: "IMAP", incorrect: ["FTP", "SMTP", "DNS"] },
-            { q: "The primary goal of the Internet Checksum used in UDP is to:", correct: "Detect bit errors (flipped bits) in the transmitted segment", incorrect: ["Guarantee that packets arrive in the correct order", "Prevent unauthorized users from intercepting the data", "Control the rate at which the sender transmits data"] },
-            { q: "Unlike HTTP, the SMTP protocol typically restricts the body of all mail messages to:", correct: "7-bit ASCII", incorrect: ["Encrypted binary data", "Multipurpose Internet Mail Extensions", "Base64 encoded JPEG images"] },
-            { q: "What happens to the average queuing delay as the 'traffic intensity' (La/R) approaches 1?", correct: "It approaches infinity", incorrect: ["It stays constant", "It decreases linearly", "It increases linearly"] },
-            { q: "The User Datagram Protocol (UDP) is best described as:", correct: "A connectionless, 'best-effort' service", incorrect: ["A protocol that guarantees in-order delivery", "A reliable, connection-oriented service", "A protocol that provides flow and congestion control"] },
-            { q: "In Go-Back-N, if packet 5 is lost but packets 6 and 7 arrive, the receiver will:", correct: "Discard packets 6 and 7 and send an ACK for packet 4", incorrect: ["Accept packets 6 and 7 and wait for packet 5 to be retransmitted", "Buffer packets 6 and 7 and send a NAK for packet 5", "Send a duplicate ACK for packet 7"] },
-            { q: "A TCP acknowledgment number (ACK) indicates:", correct: "The sequence number of the next byte expected by the receiver", incorrect: ["The checksum value used to verify the received data", "The total number of bytes received since the connection started", "The current size of the sender's congestion window"] },
-            { q: "Which type of delay depends on the distance between two routers and the propagation speed of the medium?", correct: "Propagation delay", incorrect: ["Queuing delay", "Processing delay", "Transmission delay"] },
-            { q: "What is the standard port number used by a Web (HTTP) server?", correct: "80", incorrect: ["25", "53", "443"] },
-            { q: "The 'Enter Deep' philosophy in CDNs involves:", correct: "Deploying server clusters in access ISPs to get 'close' to users", incorrect: ["Building a few massive data centers in large cities", "Placing servers only at major Internet Exchange Points (IXPs)", "Using satellite links to reach remote regions"] },
-            { q: "In video coding, 'temporal redundancy' refers to:", correct: "Repetition between images in a sequence of frames", incorrect: ["Redundancy within a single spatial image", "The delay between the server and the client during streaming", "The constant bit rate used for high-definition video"] },
-            { q: "In the TCP header, the 'rwnd' field is used to implement:", correct: "Flow control", incorrect: ["Connection setup", "Congestion control", "Error detection"] },
-            { q: "A packet at the transport layer is specifically referred to as a:", correct: "Segment", incorrect: ["Datagram", "Frame", "Message"] },
-            { q: "What is the primary function of the Domain Name System (DNS)?", correct: "Translating hostnames to IP addresses", incorrect: ["Providing security for email transmissions", "Routing packets through the network core", "Ensuring reliable data transfer between hosts"] },
-            { q: "TCP estimates the TimeoutInterval by calculating a 'safety margin' based on:", correct: "An Exponential Weighted Moving Average (EWMA) of RTT deviations", incorrect: ["The fixed value of the current congestion window size", "The number of active TCP connections sharing the router", "The maximum transmission rate of the bottleneck link"] },
-            { q: "A UDP socket is uniquely identified by which two-tuple?", correct: "Destination IP and Destination Port", incorrect: ["Source MAC and Destination MAC", "Source IP and Source Port", "Sequence Number and Acknowledgment Number"] },
-            { q: "The transport layer provides logical communication between _____, whereas the network layer provides it between _____.", correct: "Processes; Hosts", incorrect: ["Switches; Hubs", "Routers; End systems", "Hosts; Processes"] },
-            { q: "How does Persistent HTTP (HTTP/1.1) improve performance over Non-persistent HTTP?", correct: "It allows multiple objects to be sent over a single TCP connection", incorrect: ["It compresses the entity body of every message", "It eliminates the need for any header lines in request messages", "It uses UDP to avoid connection setup delays"] },
-            { q: "In DNS, what information is contained in a Type MX record?", correct: "The canonical name of the mail server for an alias name", incorrect: ["The hostname of the authoritative server for a domain", "The 128-bit IPv6 address of a host", "The IP address of a specific host"] },
-            { q: "What is the job of 'demultiplexing' at the receiving host?", correct: "Delivering the data in a transport-layer segment to the correct socket", incorrect: ["Encapsulating segments with network-layer headers to create datagrams", "Determining the shortest path from source to destination", "Breaking application messages into smaller chunks called packets"] },
-            { q: "During the TCP three-way handshake, if a server receives a SYN from a client, it responds with a SYNACK. What does the acknowledgment number in the SYNACK contain?", correct: "client_isn + 1", incorrect: ["The client's source port number", "The total length of the data field", "server_isn + 1"] },
-            { q: "Which HTTP header line is used by a client to check if a cached object is still up-to-date?", correct: "If-modified-since", incorrect: ["Set-cookie", "User-agent", "Cache-control"] },
-            { q: "Which type of DNS server is the 'contact-of-last-resort' for name resolution?", correct: "Root name server", incorrect: ["Local DNS server", "TLD server", "Authoritative server"] },
-            { q: "DNS is designed as a distributed, hierarchical database primarily to:", correct: "Avoid a single point of failure and handle massive traffic volume", incorrect: ["Make it easier for individual users to manually assign IP addresses", "Prevent routers from having to process application-layer data", "Ensure that all DNS records are stored in a centralized location"] },
-            { q: "DASH (Dynamic, Adaptive Streaming over HTTP) allows a client to:", correct: "Request different chunks of video at various bit rates based on bandwidth", incorrect: ["Force the server to encode video in real-time", "Skip the TCP three-way handshake for faster streaming", "Establish a direct UDP connection for video data"] },
-            { q: "Consider a Stop-and-Wait protocol (rdt 3.0) on a 1 Gbps link with 15 ms propagation delay. For 8000-bit packets, the sender utilization (U) is approximately:", correct: "0.00027", incorrect: ["0.98", "0.5", "0.027"] },
-            { q: "What is a 'bottleneck link' in an end-to-end path?", correct: "The link that constrains the end-to-end throughput", incorrect: ["The link with the highest transmission rate", "A wireless link subject to high interference", "The first link connected to the source host"] },
-            { q: "In Selective Repeat, to avoid ambiguity, the window size must be:", correct: "Less than or equal to half the sequence number space", incorrect: ["Exactly 1 segment", "Equal to the total sequence number space", "Determined by the MSS of the link"] },
-            { q: "The TCP 'three-way handshake' ensures that:", correct: "Both sides are ready for data transfer and have initialized sequence numbers", incorrect: ["The network layer has found the optimal path for packets", "The client has enough disk space to store the file", "The server's IP address has been translated by DNS"] },
-            { q: "The process of wrapping a transport-layer segment with a network-layer header is called:", correct: "Encapsulation", incorrect: ["Routing", "Decapsulation", "Multiplexing"] },
-            { q: "Which characteristic is the most compelling feature of Peer-to-Peer (P2P) architectures?", correct: "Self-scalability", incorrect: ["Centralized management of resources", "Use of fixed, well-known IP addresses", "Always-on infrastructure"] },
-            { q: "Which of the following is NOT one of the four components of cookie technology?", correct: "A list of the user's previously visited IP addresses stored in the router", incorrect: ["A cookie header line in the HTTP response message", "A cookie file kept on the user's host managed by the browser", "A back-end database at the Web site"] },
-            { q: "Which of the following is part of the network edge?", correct: "Personal computer (PC)", incorrect: ["Switch", "Router", "Firewall"] },
-            { q: "If a packet of length L bits is sent over a link with transmission rate R bps, the time required to push all bits into the link is:", correct: "L/R", incorrect: ["L+R", "R/L", "d/s"] }
-        ];
+<script>
+  // Dữ liệu câu hỏi (Giữ nguyên từ code gốc của bạn)
+  const originalQuestions = [
+    { id:1, title:"View trong DBMS là gì?", options:["Một loại index","Một bảng vật lý lưu dữ liệu","Một bảng ảo được tạo từ câu lệnh SELECT ","Một loại Partition"], correct:[2] },
+    { id:2, title:"Câu lệnh nào dùng để tạo View?", options:["NEW VIEW","MAKE VIEW","CREATE VIEW ","SELECT TABLE"], correct:[2] },
+    { id:3, title:"Ưu điểm chính của View là gì?", options:["Giúp bảo mật và đơn giản hóa truy vấn ","Tăng kích thước dữ liệu","Thay thế hoàn toàn bảng thật","Không cần index"], correct:[0] },
+    { id:4, title:"Stored Procedure là gì?", options:["Hàm toán học","Tập hợp các câu lệnh SQL được lưu trong DB ","Một transaction log","Một kiểu dữ liệu"], correct:[1] },
+    { id:5, title:"Khác biệt chính giữa Function và Procedure là gì?", options:["Function luôn trả về giá trị ","Procedure không có tham số","Procedure luôn trả về bảng","Function không chứa SQL"], correct:[0] },
+    { id:6, title:"Mục đích chính của Index là gì?", options:["Tăng số lượng bảng","Xóa dữ liệu nhanh hơn","Tăng tốc truy vấn ","Giảm dung lượng DB"], correct:[2] },
+    { id:7, title:"Primary Key thường tự động tạo loại index nào?", options:["Full-text index","Bitmap index","Non-clustered index","Clustered index "], correct:[3] },
+    { id:8, title:"Full Text Search dùng để:", options:["Tìm kiếm văn bản nâng cao ","Tạo transaction","Đồng bộ dữ liệu","Chia bảng"], correct:[0] },
+    { id:9, title:"Trigger sẽ tự động thực thi khi nào?", options:["Khi backup","Khi tạo bảng","Khi có sự kiện INSERT/UPDATE/DELETE ","Khi khởi động DB"], correct:[2] },
+    { id:10, title:"Trigger BEFORE INSERT dùng để:", options:["Chạy trước khi thêm dữ liệu ","Chạy trước khi xóa dữ liệu","Chạy sau khi xóa dữ liệu","Chạy sau khi thêm dữ liệu"], correct:[0] },
+    { id:11, title:"View nào cho phép cập nhật dữ liệu trực tiếp?", options:["View có GROUP BY","View có UNION","View có DISTINCT","View đơn giản từ một bảng "], correct:[3] },
+    { id:12, title:"Clustered Index ảnh hưởng như thế nào tới dữ liệu?", options:["Xóa dữ liệu","Mã hóa dữ liệu","Sắp xếp vật lý dữ liệu trên đĩa ","Không ảnh hưởng"], correct:[2] },
+    { id:13, title:"Một bảng thường có tối đa bao nhiêu Clustered Index?", options:["1 ","Không giới hạn","0","2"], correct:[0] },
+    { id:14, title:"Một bảng thường có tối đa bao nhiêu Non-Clustered Index?", options:["2","0","Không giới hạn ","1"], correct:[2] },
+    { id:15, title:"Ưu điểm của Full Text Search so với LIKE '%abc%' là gì?", options:["Hỗ trợ stemming/tokenization ","Hỗ trợ ranking ","Giống nhau","Nhanh hơn trên dữ liệu lớn "], correct:[0,1,3] },
+    { id:16, title:"Rủi ro của Trigger là gì?", options:["Không có rủi ro nào","Có thể tạo vòng lặp trigger ","Gây giảm hiệu năng ","Logic khó debug "], correct:[1,2,3] },
+    { id:17, title:"Partitioning là kỹ thuật gì?", options:["Mã hóa dữ liệu","Nén dữ liệu","Chia nhỏ bảng/index thành nhiều phần ","Sao lưu DB"], correct:[2] },
+    { id:18, title:"Range Partitioning thường áp dụng cho dữ liệu nào?", options:["Dữ liệu dạng số ","Dữ liệu nào cũng áp dụng được","Dữ liệu dạng văn bản","Theo khoảng thời gian/ngày tháng "], correct:[0,3] },
+    { id:19, title:"Lệnh dùng để xác nhận transaction là:", options:["COMMIT ","ROLLBACK","FINISH","SAVE"], correct:[0] },
+    { id:20, title:"ROLLBACK dùng để:", options:["Xác nhận dữ liệu","Khôi phục transaction chưa commit ","Khôi phục transaction, dữ liệu bị thay đổi","Khôi phục transaction, dữ liệu không bị thay đổi"], correct:[1] },
+    { id:21, title:"Dirty Read xảy ra khi:", options:["Đọc view","Đọc dữ liệu bị mã hóa","Đọc dữ liệu đã backup","Đọc dữ liệu chưa commit của transaction khác "], correct:[3] },
+    { id:22, title:"Isolation Level nào ngăn Dirty Read?", options:["READ UNCOMMITTED","REPEATABLE-READ ","READ COMMITTED ","SERIALIZABLE "], correct:[1,2,3] },
+    { id:23, title:"Deadlock là gì?", options:["Hỏng replication","Lỗi syntax","Hai transaction chờ khóa lẫn nhau ","Mất index"], correct:[2] },
+    { id:24, title:"Serializable Isolation Level có đặc điểm gì?", options:["Đảm bảo cô lập cao nhất ","Không dùng lock","Nhanh nhất","Chậm nhất "], correct:[0,3] },
+    { id:25, title:"Composite Index là gì?", options:["Index mã hóa","Index cho trigger","Index trên một cột","Index trên nhiều cột "], correct:[3] },
+    { id:26, title:"Recursive Trigger là gì?", options:["Trigger backup","Trigger tự gọi lại chính nó ","Trigger replication","Trigger bình thường"], correct:[1] },
+    { id:27, title:"Replication trong DBMS dùng để:", options:["Tạo index","Đồng bộ dữ liệu giữa nhiều server ","Chia bảng","Tạo trigger"], correct:[1] },
+    { id:28, title:"Master-Slave Replication có đặc điểm nào?", options:["Slave đọc dữ liệu ","Không đồng bộ dữ liệu","Master gửi dữ liệu sang Slave ","Slave ghi dữ liệu chính"], correct:[0,2] },
+    { id:29, title:"Câu lệnh nào tạo đúng một View tên vw_Students?", options:["CREATE VIEW vw_Students AS SELECT * FROM Students; ","MAKE VIEW vw_Students;","CREATE TABLE vw_Students AS SELECT * FROM Students;","NEW VIEW vw_Students;"], correct:[0] },
+    { id:30, title:"Procedure dưới đây dùng để làm gì? <pre>CREATE PROCEDURE sp_GetStudents\nAS\nBEGIN\nSELECT * FROM Students;\nEND;</pre>", options:["Tạo Trigger","Tạo View","Lấy danh sách sinh viên ","Xóa bảng Students"], correct:[2] },
+    { id:31, title:"Procedure dưới đây có bao nhiêu parameter? <pre>CREATE PROCEDURE sp_AddStudent\n@Name NVARCHAR(100),\n@Age INT</pre>", options:["3","1","0","2 "], correct:[3] },
+    { id:32, title:"Lệnh nào gọi đúng Function fn_Sum?", options:["RUN fn_Sum(1,2);","EXEC fn_Sum(1,2);","CALL fn_Sum(1,2);","SELECT dbo.fn_Sum(1,2); "], correct:[3] },
+    { id:33, title:"Query nào dùng Full Text Search?", options:["SELECT * FROM Articles WHERE Content = 'SQL';","SELECT * FROM Articles WHERE CONTAINS(Content, 'SQL'); ","SELECT * FROM Articles WHERE Content > 'SQL';","SELECT * FROM Articles;"], correct:[1] },
+    { id:34, title:"Transaction dưới đây thiếu lệnh gì? <pre>BEGIN TRANSACTION;\nUPDATE Accounts\nSET Balance = Balance - 100;</pre>", options:["COMMIT ","Không thiếu gì"], correct:[0] },
+    { id:35, title:"Composite Index sau phù hợp nhất cho Query nào? <pre>CREATE INDEX idx_Order\nON Orders(CustomerID, OrderDate);</pre>", options:["SELECT * FROM Orders WHERE CustomerID = 1; ","SELECT * FROM Orders WHERE OrderDate = '2025-01-01';"], correct:[0] },
+    { id:36, title:"Lệnh nào rebuild toàn bộ index?", options:["ALTER INDEX ALL ON Orders REBUILD; ","REFRESH INDEX;","CREATE REBUILD INDEX;","REBUILD TABLE Orders;"], correct:[0] },
+    { id:37, title:"Isolation Level cao nhất là:", options:["REPEATABLE READ","READ UNCOMMITTED","SERIALIZABLE ","READ COMMITTED"], correct:[2] },
+    { id:38, title:"SAVEPOINT dùng để:", options:["Đánh dấu điểm rollback trong transaction ","Backup DB","Tạo replication","Tạo index"], correct:[0] },
+    { id:39, title:"LIST Partitioning dùng khi:", options:["Chia theo hash function","Chia dữ liệu theo danh sách giá trị xác định ","Chia ngẫu nhiên dữ liệu","Chia theo index"], correct:[1] },
+    { id:40, title:"Ví dụ phù hợp với LIST Partitioning là:", options:["Chia theo ngày tháng","Chia theo số ngẫu nhiên","Chia theo quốc gia: VN, US, JP ","Chia theo năm"], correct:[2] },
+    { id:41, title:"Query nào tận dụng index tốt nhất?", options:["SELECT * FROM Orders WHERE CustomerID = 5; ","SELECT * FROM Orders WHERE YEAR(OrderDate) = 2025;","SELECT * FROM Orders WHERE OrderDate = '2025-01-01';","SELECT * FROM Orders WHERE TotalAmount > 1000;"], correct:[0] },
+    { id:42, title:"Vì sao query sau có thể không dùng index hiệu quả? <pre>SELECT *\nFROM Orders\nWHERE YEAR(OrderDate) = 2025;</pre>", options:["Vì thiếu GROUP BY","Vì kiểm tra điều kiện qua các functions của cột index ","Vì SELECT *","Vì YEAR() làm mất khả năng seek index "], correct:[1,3] },
+    { id:43, title:"Cho query sau. Index nào tối ưu nhất? <pre>SELECT ProductName, Price\nFROM Products\nWHERE CategoryID = 1;</pre>", options:["CREATE INDEX idx2 ON Products(CategoryID) INCLUDE(ProductName, Price); ","CREATE INDEX idx4 ON Products(Price);","CREATE INDEX idx3 ON Products(ProductName);","CREATE INDEX idx1 ON Products(CategoryID);"], correct:[0] },
+    { id:44, title:"Trong Composite Index, thứ tự cột ảnh hưởng đến:", options:["Khả năng sử dụng index của query ","Không ảnh hưởng gì","Có phụ thuộc vào thứ tự ","Phụ thuộc vào thứ từ từ phải sang trái"], correct:[0,2] },
+    { id:45, title:"Clustered Index khác Nonclustered Index ở điểm:", options:["Không khác nhau","Clustered Index sắp xếp dữ liệu vật lý ","Clustered Index nhanh hơn mọi trường hợp","Nonclustered Index không chứa key"], correct:[1] },
+    { id:46, title:"Cho query sau. Vì sao index có thể không hiệu quả? <pre>SELECT *\nFROM Customers\nWHERE Email LIKE '%gmail.com';</pre>", options:["Vì Email là VARCHAR","Wildcard ở đầu chuỗi ","Vì SELECT *","Vì kiểm tra điều kiện với LIKE trên chuỗi văn bản"], correct:[1] },
+    { id:47, title:"Cho đoạn code sau: <pre>BEGIN TRANSACTION;\nUPDATE Products\nSET Stock = Stock - 1\nWHERE ProductID = 10;\nROLLBACK;</pre>", options:["Transaction vẫn commit","Stock không thay đổi ","Stock giảm 1","Product bị xóa"], correct:[1] },
+    { id:48, title:"Isolation Level nào cho phép Dirty Read?", options:["READ UNCOMMITTED ","SERIALIZABLE","READ COMMITTED","REPEATABLE READ"], correct:[0] },
+    { id:49, title:"Cho transaction: <pre>BEGIN TRANSACTION;\nDELETE FROM Orders WHERE OrderID = 1;\nDELETE FROM OrderDetails WHERE OrderID = 1;\nCOMMIT;</pre>", options:["Không cần COMMIT","Sai syntax","Có thể vi phạm khóa ngoại nếu xóa Orders trước ","Không vấn đề gì"], correct:[2] },
+    { id:50, title:"Trong hệ thống lưu log hàng tỷ bản ghi theo thời gian, loại partitioning phù hợp nhất là:", options:["LIST Partitioning","HASH Partitioning","KEY Partitioning","RANGE Partitioning theo ngày/tháng "], correct:[3] },
+    { id:51, title:"Cho bảng partition theo HASH(CustomerID). Ưu điểm lớn nhất của HASH Partitioning là gì?", options:["Không cần index","Query theo ngày nhanh hơn","Dữ liệu phân phối đồng đều giữa các partition ","Không cần statistics"], correct:[2] },
+    { id:52, title:"Partition Scheme dùng để:", options:["Ánh xạ partition vào filegroup ","Tạo index","Tạo trigger","Tạo View"], correct:[0] },
+    { id:53, title:"Lợi ích lớn nhất của Partitioning trên bảng lớn là:", options:["Không có lợi ích gì","Tăng tốc query và quản lý dữ liệu dễ hơn ","Không cần index","Không cần backup"], correct:[1] },
+    { id:54, title:"Có Composite Partitioning không?", options:["Không","Có "], correct:[1] },
+    { id:55, title:"Thiết kế nào phù hợp cho hệ thống thương mại điện tử toàn cầu?", options:["HASH theo UserID","LIST theo quốc gia","Không cần partition","LIST theo quốc gia + HASH theo UserID "], correct:[3] },
+    { id:56, title:"Hệ thống nào phù hợp cho giao dịch thời gian thực?", options:["OLAP","Data Warehouse","OLTP ","Data Mining"], correct:[2] },
+    { id:57, title:"Ví dụ điển hình của hệ thống OLTP là:", options:["Báo cáo tài chính","Dashboard phân tích doanh thu","Data Warehouse","Hệ thống chuyển khoản ngân hàng "], correct:[3] },
+    { id:58, title:"Ví dụ điển hình của hệ thống OLAP là:", options:["Báo cáo phân tích doanh thu ","ATM ngân hàng","Đặt hàng online","Thanh toán online"], correct:[0] },
+    { id:59, title:"Hệ thống nào thường yêu cầu ACID nghiêm ngặt hơn?", options:["OLTP ","Backup System","OLAP"], correct:[0] },
+    { id:60, title:"Hệ thống nào thường dùng Data Warehouse?", options:["OLAP ","OLTP"], correct:[0] }
+  ];
 
-        let currentScore = 0;
-        let totalQuestions = rawQuestions.length;
+  // Logic Đảo
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+  const questions = shuffle(originalQuestions).map(q => {
+    const indices = q.options.map((_, i) => i);
+    const shuffledIdx = shuffle(indices);
+    return {
+      ...q,
+      options: shuffledIdx.map(i => q.options[i]),
+      correct: q.correct.map(c => shuffledIdx.indexOf(c))
+    };
+  });
+
+  let userState = {};
+
+  function render() {
+    const container = document.getElementById('quizContainer');
+    container.innerHTML = questions.map((q, i) => `
+      <div class="question-card" id="card-${i}">
+        <div class="q-title"><span class="q-num">${i+1}</span> ${q.title} <span id="status-${i}"></span></div>
+        <div class="options">
+          ${q.options.map((opt, optIdx) => `
+            <label class="option-item" id="opt-label-${i}-${optIdx}">
+              <input type="checkbox" onchange="checkQuestion(${i}, ${optIdx})" id="check-${i}-${optIdx}">
+              <span>${opt}</span>
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.checkQuestion = function(qIdx, optIdx) {
+    const q = questions[qIdx];
+    const correctSet = new Set(q.correct);
+    const selected = [];
+    
+    // Lấy các option đã chọn
+    q.options.forEach((_, idx) => {
+      if(document.getElementById(`check-${qIdx}-${idx}`).checked) selected.push(idx);
+    });
+
+    const card = document.getElementById(`card-${qIdx}`);
+    const status = document.getElementById(`status-${qIdx}`);
+    
+    // Reset style options trước khi đánh dấu lại
+    q.options.forEach((_, idx) => {
+      const label = document.getElementById(`opt-label-${qIdx}-${idx}`);
+      label.classList.remove('correct-marker', 'user-wrong-marker');
+      // Hiển thị đáp án đúng luôn
+      if(correctSet.has(idx)) label.classList.add('correct-marker');
+    });
+
+    // Tính đúng sai cho Card
+    let hasWrong = selected.some(s => !correctSet.has(s));
+    let isPerfect = selected.length === correctSet.size && !hasWrong;
+    
+    card.classList.remove('correct-card', 'wrong-card', 'partial-card');
+    
+    if (selected.length === 0) {
+      status.innerHTML = "";
+    } else if (hasWrong) {
+      card.classList.add('wrong-card');
+      status.innerHTML = "❌ (0đ)";
+      selected.forEach(s => {
+         if(!correctSet.has(s)) document.getElementById(`opt-label-${qIdx}-${s}`).classList.add('user-wrong-marker');
+      });
+    } else if (isPerfect) {
+      card.classList.add('correct-card');
+      status.innerHTML = "✅ (Xong)";
+    } else {
+      card.classList.add('partial-card');
+      status.innerHTML = "⚠️ (Thiếu)";
+    }
+
+    updateTotalScore();
+  };
+
+  function updateTotalScore() {
+    let totalPoints = 0;
+    let perfectCount = 0;
+
+    questions.forEach((q, i) => {
+      const correctSet = new Set(q.correct);
+      const selected = [];
+      q.options.forEach((_, idx) => {
+        if(document.getElementById(`check-${i}-${idx}`).checked) selected.push(idx);
+      });
+
+      if (selected.length > 0) {
+        let hasWrong = selected.some(s => !correctSet.has(s));
+        if (!hasWrong) {
+          totalPoints += (selected.length / correctSet.size);
+          if (selected.length === correctSet.size) perfectCount++;
         }
+      }
+    });
 
-        function initQuiz() {
-            currentScore = 0;
-            document.getElementById('correct-score').innerText = currentScore;
-            document.getElementById('total-score').innerText = totalQuestions;
-            
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = '';
+    document.getElementById('correctCount').innerText = perfectCount;
+    document.getElementById('livePoints').innerText = totalPoints.toFixed(2);
+  }
 
-            let shuffledQuestions = shuffleArray([...rawQuestions]);
+  render();
+</script>
 
-            shuffledQuestions.forEach((item, index) => {
-                const questionCard = document.createElement('div');
-                questionCard.className = 'question-card';
-                
-                const qText = document.createElement('div');
-                qText.className = 'question-text';
-                qText.innerText = `Câu ${index + 1}: ${item.q}`;
-                questionCard.appendChild(qText);
-
-                let options = [{ text: item.correct, isCorrect: true }];
-                item.incorrect.forEach(inc => options.push({ text: inc, isCorrect: false }));
-                options = shuffleArray(options);
-
-                const optionsContainer = document.createElement('div');
-                optionsContainer.className = 'options-container';
-
-                options.forEach(opt => {
-                    const optDiv = document.createElement('div');
-                    optDiv.className = 'option';
-                    optDiv.innerText = opt.text;
-                    
-                    // Lưu trạng thái đúng vào dataset để dễ truy xuất
-                    if (opt.isCorrect) optDiv.dataset.isCorrect = "true";
-                    
-                    optDiv.onclick = function() {
-                        if (optionsContainer.getAttribute('data-answered') === 'true') return;
-                        
-                        optionsContainer.setAttribute('data-answered', 'true');
-                        
-                        // Disable tất cả các option và hiển thị kết quả
-                        Array.from(optionsContainer.children).forEach(child => {
-                            child.classList.add('disabled');
-                            // Tự động tìm và làm nổi bật đáp án đúng (màu xanh)
-                            if (child.dataset.isCorrect === "true") {
-                                child.classList.add('correct');
-                            }
-                        });
-
-                        if (opt.isCorrect) {
-                            currentScore++;
-                            document.getElementById('correct-score').innerText = currentScore;
-                        } else {
-                            // Nếu chọn sai, bôi đỏ lựa chọn hiện tại
-                            optDiv.classList.add('incorrect');
-                        }
-                    };
-                    optionsContainer.appendChild(optDiv);
-                });
-
-                questionCard.appendChild(optionsContainer);
-                container.appendChild(questionCard);
-            });
-            
-            window.scrollTo(0, 0);
-        }
-
-        window.onload = initQuiz;
-    </script>
 </body>
 </html>
